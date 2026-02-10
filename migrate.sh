@@ -51,8 +51,10 @@ log "✓ 目標目錄已創建"
 
 # 步驟 4：複製內容
 log "步驟 4：複製內容"
+log "步驟 4：複製內容"
 shopt -s dotglob
 cp -r "$SOURCE/"* "$TARGET/" 2>&1 | tee -a "$LOG_FILE"
+shopt -u dotglob
 cp_exit=${PIPESTATUS[0]}
 shopt -u dotglob
 if [ "$cp_exit" -ne 0 ]; then
