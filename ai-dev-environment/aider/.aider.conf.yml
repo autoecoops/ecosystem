@@ -1,0 +1,50 @@
+# Aider Configuration
+# Aider is a powerful CLI AI coding assistant
+
+# Model configuration
+model: ollama/deepseek-coder-v2:16b
+editor-model: ollama/llama3.1:70b
+
+# API configuration
+api-key: dummy  # Ollama doesn't need API key
+api-base: http://localhost:11434
+
+# Git configuration
+auto-commit: true
+auto-commit-message: "🤖 AI edit: {description}"
+git-diff: true
+gitignore: true
+
+# Safety settings
+confirm-dangerous-edits: true
+dry-run: false
+
+# File handling
+file-include: "*.ts,*.tsx,*.js,*.jsx,*.py,*.go,*.rs,*.java,*.c,*.cpp"
+file-exclude: "node_modules,dist,build,.next"
+
+# Context window
+max-tokens: 4096
+context-window: 8192
+
+# Advanced settings
+map-tokens: 1024
+map-multiplier-no-files: 2
+
+# Governance integration hooks
+pre-commit: ../scripts/governance-integration/opa-policy-check.sh
+post-commit: ../scripts/governance-integration/seal-ai-change.sh
+
+# Output formatting
+yes-always: false
+stream: true
+
+# Analysis settings
+auto-lint: true
+auto-test: true
+test-cmd: pnpm test
+
+# User experience
+chat-mode: ask
+show-model-warnings: true
+show-repo-map: true

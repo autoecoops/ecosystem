@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # Ollama - Local Model Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Tabby - Autocomplete Server (Optional)
+  tabby:
+    image: tabbyml/tabby:latest
+    container_name: tabby
+    ports:
+      - "8080:8080"
+    volumes:
+      - tabby_data:/data
+      - ./tabby-config:/root/.tabby
+    environment:
+      - TABBY_MODEL_HOSTING=local
+    restart: unless-stopped
+    depends_on:
+      - ollama
+
+  # OPA - Open Policy Agent (Governance)
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: opa
+    ports:
+      - "8181:8181"
+    command:
+      - "run"
+      - "--server"
+      - "--log-format=json"
+      - "--set=decision_logs.console=true"
+      - "/policies"
+    volumes:
+      - ./policies:/policies:ro
+    restart: unless-stopped
+
+  # Redis - For caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: ai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # MinIO - Evidence Layer storage
+  minio:
+    image: minio/minio:latest
+    container_name: ai-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=admin123
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+  tabby_data:
+  redis_data:
+  minio_data:
+
+networks:
+  default:
+    name: ai-dev-network
