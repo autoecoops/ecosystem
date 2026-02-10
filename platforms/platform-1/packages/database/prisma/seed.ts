@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -49,7 +50,7 @@ async function main() {
       originalFileName: 'sample.pdf',
       fileSize: 245678,
       mimeType: 'application/pdf',
-      s3Key: `contracts/${demoUser.id}/sample-${Date.now()}.pdf`,
+      s3Key: `contracts/${demoUser.id}/${randomUUID()}.pdf`,
       status: 'COMPLETED'
     }
   });
