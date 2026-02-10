@@ -53,7 +53,12 @@ log "✓ 目標目錄已創建"
 log "步驟 4：複製內容"
 shopt -s dotglob
 cp -r "$SOURCE/"* "$TARGET/" 2>&1 | tee -a "$LOG_FILE"
+cp_exit=${PIPESTATUS[0]}
 shopt -u dotglob
+if [ "$cp_exit" -ne 0 ]; then
+    log "錯誤：複製內容失敗 (cp exit code: $cp_exit)"
+    exit "$cp_exit"
+fi
 log "✓ 內容已複製"
 
 # 步驟 5：驗證複製
