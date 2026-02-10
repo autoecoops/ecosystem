@@ -14,10 +14,11 @@ async function main() {
   await prisma.usageRecord.deleteMany();
   await prisma.notification.deleteMany();
 
-  // Create demo user with real bcrypt hash for "password123"
-  // NOTE: This is a weak password and should ONLY be used for local development/testing
-  // Never use this password in production environments
-  const passwordHash = await bcrypt.hash('password123', 10);
+  // Create demo user with bcrypt hash
+  // NOTE: Use SEED_PASSWORD env var to set password, defaults to a development-only password
+  // Never use the default password in production environments
+  const seedPassword = process.env.SEED_PASSWORD || 'DevOnly_P@ssw0rd123!';
+  const passwordHash = await bcrypt.hash(seedPassword, 10);
   
   const demoUser = await prisma.user.create({
     data: {
@@ -76,8 +77,8 @@ async function main() {
   console.log('Created analysis');
 
   console.log('Seed completed successfully!');
-  console.log('Demo user: demo@contracts-l1.com / password123');
-  console.log('Admin user: admin@contracts-l1.com / password123');
+  console.log(`Demo user: demo@contracts-l1.com / ${seedPassword}`);
+  console.log(`Admin user: admin@contracts-l1.com / ${seedPassword}`);
 }
 
 main()
