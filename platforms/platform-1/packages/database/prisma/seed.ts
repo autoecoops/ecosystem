@@ -229,8 +229,8 @@ async function main() {
 
   console.log(`✅ 創建了通知`);
 
-  console.log('
-🎉 測試數據播種完成!');
+  console.log(`
+🎉 測試數據播種完成!`);
   console.log(`
 登入資訊:`);
   console.log(`  Demo 用戶: demo@contracts-l1.com / password123`);
