@@ -8,9 +8,12 @@ async function main() {
   console.log('Starting seed...');
 
   // Ensure we're in a development environment
-  if (process.env.NODE_ENV === 'production') {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  if (nodeEnv === 'production') {
     throw new Error('Seed script should not be run in production environment');
   }
+
+  console.log(`Running seed in ${nodeEnv} environment...`);
 
   // Clean database
   await prisma.user.deleteMany();
