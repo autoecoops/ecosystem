@@ -95,7 +95,12 @@ if command -v sed &> /dev/null; then
     # 使用便攜方式更新 package.json 中的 name 字段
     if sed 's/"name":[[:space:]]*"[^"]*"/"name": "platform-1"/' "$TARGET/package.json" > "$TARGET/package.json.tmp"; then
         mv "$TARGET/package.json.tmp" "$TARGET/package.json"
-        log "✓ package.json 已更新"
+        # 驗證替換是否成功
+        if grep -q '"name":[[:space:]]*"platform-1"' "$TARGET/package.json"; then
+            log "✓ package.json 已更新"
+        else
+            log "警告：package.json name 字段可能未成功更新，請手動檢查"
+        fi
     else
         log "錯誤：更新 package.json 失敗，請手動檢查並更新 name 字段"
         rm -f "$TARGET/package.json.tmp"
