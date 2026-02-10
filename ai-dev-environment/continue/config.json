@@ -1,0 +1,70 @@
+{
+  "$schema": "https://continue.com/schema.json",
+  "models": [
+    {
+      "title": "DeepSeek Coder V2 (Local)",
+      "provider": "ollama",
+      "model": "deepseek-coder-v2:16b",
+      "apiBase": "http://localhost:11434",
+      "description": "最強本地代碼生成模型"
+    },
+    {
+      "title": "Qwen2.5 Coder (Local)",
+      "provider": "ollama",
+      "model": "qwen2.5-coder:32b",
+      "apiBase": "http://localhost:11434",
+      "description": "平衡性能與速度的代碼模型"
+    },
+    {
+      "title": "Llama 3.1 70B (Local)",
+      "provider": "ollama",
+      "model": "llama3.1:70b",
+      "apiBase": "http://localhost:11434",
+      "description": "強大的通用推理模型"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "DeepSeek Coder",
+    "provider": "ollama",
+    "model": "deepseek-coder-v2:16b"
+  },
+  "slashCommands": [
+    {
+      "name": "edit",
+      "description": "編輯選中代碼並治理驗證"
+    },
+    {
+      "name": "explain",
+      "description": "解釋選中代碼"
+    },
+    {
+      "name": "test",
+      "description": "生成測試用例"
+    },
+    {
+      "name": "refactor",
+      "description": "重構選中代碼並生成 seal"
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "Apply with Governance Seal",
+      "description": "應用變更並執行治理密封",
+      "prompt": "Apply this change to the code, then run the governance seal script to record the change in the Evidence Layer.",
+      "command": "bash ../scripts/governance-integration/seal-ai-change.sh"
+    },
+    {
+      "name": "OPA Policy Check",
+      "description": "在修改前執行 OPA 政策檢查",
+      "prompt": "Before applying any changes, run the OPA policy check to ensure compliance with governance rules.",
+      "command": "bash ../scripts/governance-integration/opa-policy-check.sh"
+    }
+  ],
+  "governance": {
+    "enabled": true,
+    "autoSeal": true,
+    "opaPolicyCheck": true,
+    "evidenceLayer": "evidence/ai-changes.log",
+    "sealScript": "../scripts/governance-integration/seal-ai-change.sh"
+  }
+}

@@ -2,3 +2,5 @@ packages:
   - 'platforms/*'
   - 'shared-libs/*'
   - 'tools/*'
+  - 'apps/*'
+  - 'packages/*'
