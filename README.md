@@ -81,26 +81,19 @@ pnpm run dev
 ## 📖 文檔
 
 ### 架構文檔
-- [系統架構設計](docs/architecture/system-design.md) - 整體架構概覽與設計決策
-- [資料模型說明](docs/architecture/data-model.md) - 資料庫結構與關係定義
-- [架構演進指南](docs/architecture/evolution-guide.md) - 從單體到微服務的遷移路徑
-- [架構決策記錄](docs/architecture/ADR/) - 重要技術決策的歷史脈絡
+- [架構演進指南](docs/architecture/evolution-guide.md) - 從單體到微服務的遷移路徑與整體架構概覽
+
+### 部署文檔
+- [零成本部署指南](docs/deployment/zero-cost-deployment-guide.md) - 使用免費服務部署完整應用
 
 ### API 文檔
-- [REST API 參考](docs/api/openapi.yml) - OpenAPI 3.0 規範
-- [GraphQL Schema](docs/api/graphql-schema.gql) - GraphQL 查詢介面
-- [Webhook 說明](docs/api/webhooks.md) - 事件通知機制
+API 文檔將隨著項目開發逐步完善
 
 ### 開發指南
-- [開發環境設定](docs/development/setup.md) - 詳細的環境配置步驟
-- [編碼規範](docs/development/coding-standards.md) - 程式碼風格與最佳實踐
-- [貢獻指南](docs/development/contributing.md) - 如何參與專案開發
-- [測試策略](docs/development/testing.md) - 單元、整合、端到端測試
+- 請參閱 [QUICKSTART.md](QUICKSTART.md) 了解如何開始開發
 
 ### 使用者指南
-- [快速入門](docs/user-guides/getting-started.md) - 新使用者導覽
-- [功能說明](docs/user-guides/features.md) - 完整功能介紹
-- [常見問題](docs/user-guides/faq.md) - 疑難解答
+使用者指南將隨著項目開發逐步完善
 
 ## 🏗️ 專案結構
 
