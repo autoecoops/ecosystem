@@ -1,0 +1,357 @@
+# Contracts-L1 漸進式架構演進配置
+# 支援從單體→混合→微服務的平滑過渡
+# 支援從有碼→微碼→零碼的開發模式切換
+
+version: "1.0.0"
+project:
+  name: "Contracts-L1"
+  description: "AI驅動的契約管理與分析平台"
+  architecture_stage: "intelligent-monolith" # intelligent-monolith | hybrid | microservices
+  coding_paradigm: "full-code" # full-code | low-code | no-code | mixed
+
+# ============================================================================
+# 架構演進階段定義
+# ============================================================================
+architecture_stages:
+  intelligent-monolith:
+    description: "模組化單體架構,為微服務拆分做準備"
+    deployment_target: "railway" # 單一容器部署
+    database_strategy: "single-postgres-multi-schema"
+    communication: "in-process-events"
+    scaling: "vertical"
+    complexity: "low"
+    team_size: "2-5"
+    
+  hybrid:
+    description: "核心保持單體,資源密集模組獨立為服務"
+    deployment_target: "railway + vercel-functions"
+    database_strategy: "primary-postgres + service-specific-dbs"
+    communication: "rest-api + message-queue"
+    scaling: "horizontal-for-services"
+    complexity: "medium"
+    team_size: "5-15"
+    
+  microservices:
+    description: "完全微服務架構,每個業務能力獨立服務"
+    deployment_target: "kubernetes"
+    database_strategy: "database-per-service"
+    communication: "grpc + event-streaming"
+    scaling: "auto-scaling-all-services"
+    complexity: "high"
+    team_size: "15+"
+
+# ============================================================================
+# 編碼範式配置
+# ============================================================================
+coding_paradigms:
+  full-code:
+    core_services: ["auth", "contract-management", "ai-analysis"]
+    languages: ["typescript", "python"]
+    frameworks:
+      frontend: "nextjs-14"
+      backend: "express-js"
+      orm: "prisma"
+    testing: "jest + playwright"
+    
+  low-code:
+    applicable_modules: ["admin-dashboard", "reporting", "workflow-automation"]
+    platforms:
+      ui: "retool" # 開源替代: Appsmith, Budibase
+      workflow: "n8n" # 完全開源免費
+      etl: "airbyte" # 開源數據同步
+    integration: "rest-api-bridge"
+    
+  no-code:
+    configuration_driven: true
+    config_formats: ["yaml", "json"]
+    ui_based_config: true
+    managed_by: ["business-analysts", "domain-experts"]
+    areas:
+      - "semantic-engine-rules"
+      - "ai-model-orchestration"
+      - "business-logic-rules"
+      - "notification-templates"
+
+# ============================================================================
+# 語義引擎配置 (零碼配置範例)
+# ============================================================================
+semantic_engine:
+  vector_folding:
+    enabled: true
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+    dimension: 384
+    batch_size: 32
+    cache_embeddings: true
+    storage: "pinecone-free-tier" # 或 "qdrant-self-hosted"
+    
+  graph_folding:
+    enabled: true
+    database: "neo4j-community"
+    node_types:
+      - "Company"
+      - "Contract"
+      - "Clause"
+      - "LegalTerm"
+      - "RiskFactor"
+    relationship_types:
+      - "CONTAINS"
+      - "REFERENCES"
+      - "CONSTRAINS"
+      - "SIMILAR_TO"
+    indexing:
+      - field: "name"
+        type: "btree"
+      - field: "created_at"
+        type: "range"
+        
+  hybrid_search:
+    enabled: true
+    vector_weight: 0.7
+    graph_weight: 0.3
+    text_weight: 0.2
+    fusion_strategy: "reciprocal-rank-fusion"
+    
+  real_time_indexing:
+    enabled: true
+    update_strategy: "incremental"
+    batch_interval: "30s"
+    max_batch_size: 100
+
+# ============================================================================
+# AI 推理引擎分層配置
+# ============================================================================
+ai_inference:
+  routing_strategy: "intelligent-multi-tier"
+  
+  local_tier:
+    enabled: true
+    models:
+      - name: "llama-3.2-8b"
+        tasks: ["clause-classification", "entity-extraction"]
+        deployment: "huggingface-spaces-gpu"
+        cost: "free"
+      - name: "legal-bert"
+        tasks: ["legal-term-recognition"]
+        deployment: "local-cpu"
+        cost: "free"
+    fallback_to_cloud: true
+    max_response_time: "10s"
+    
+  cloud_tier:
+    enabled: true
+    providers:
+      - name: "openai"
+        models: ["gpt-4-turbo-preview"]
+        quota: "monthly-free-credits"
+        tasks: ["complex-analysis", "risk-assessment"]
+        priority: 1
+      - name: "anthropic"
+        models: ["claude-3-sonnet"]
+        quota: "trial-credits"
+        tasks: ["complex-analysis"]
+        priority: 2
+      - name: "google"
+        models: ["gemini-pro"]
+        quota: "free-tier-60rpm"
+        tasks: ["general-analysis"]
+        priority: 3
+    aggregator_enabled: true
+    auto_failover: true
+    
+  hybrid_strategy:
+    simple_contracts_threshold: 10 # 頁數
+    route_to: "local_tier"
+    complex_contracts:
+      route_to: "cloud_tier"
+      quality_check: "local_tier" # 本地模型驗證結果
+    cost_budget_per_user:
+      free: "$0"
+      starter: "$5/month"
+      professional: "$20/month"
+
+# ============================================================================
+# 服務拆分準備度評估 (用於從單體遷移到微服務)
+# ============================================================================
+service_extraction_readiness:
+  ai_analysis_service:
+    independence_score: 9/10
+    resource_intensive: true
+    change_frequency: "high"
+    team_ownership: "ai-team"
+    ready_for_extraction: true
+    priority: 1
+    
+  semantic_indexing_service:
+    independence_score: 8/10
+    resource_intensive: true
+    change_frequency: "medium"
+    team_ownership: "data-team"
+    ready_for_extraction: true
+    priority: 2
+    
+  notification_service:
+    independence_score: 7/10
+    resource_intensive: false
+    change_frequency: "low"
+    team_ownership: "platform-team"
+    ready_for_extraction: false
+    priority: 5
+
+# ============================================================================
+# 零成本基礎設施配置
+# ============================================================================
+infrastructure:
+  development:
+    frontend: "vercel-preview-deployment"
+    backend: "railway-development-instance"
+    database: "supabase-free-tier"
+    cache: "upstash-redis-free"
+    storage: "supabase-storage-2gb"
+    ai_hosting: "huggingface-spaces-free-gpu"
+    
+  staging:
+    frontend: "vercel-pro-trial"
+    backend: "railway-hobby-plan"
+    database: "supabase-free-tier"
+    cache: "upstash-redis-free"
+    storage: "supabase-storage-2gb"
+    monitoring: "betterstack-free-tier"
+    
+  production:
+    frontend: "vercel-free-tier"
+    backend: "railway-free-tier"
+    database: "supabase-free-tier"
+    cache: "upstash-redis-free"
+    storage: "cloudflare-r2-free-10gb"
+    cdn: "cloudflare-free"
+    monitoring: "grafana-cloud-free"
+    error_tracking: "sentry-free-tier"
+
+# ============================================================================
+# CI/CD 工作流配置
+# ============================================================================
+ci_cd:
+  platform: "github-actions"
+  workflows:
+    pr_check:
+      triggers: ["pull_request"]
+      jobs:
+        - "lint-check"
+        - "type-check"
+        - "unit-tests"
+        - "integration-tests"
+        - "security-scan"
+        - "coderabbit-ai-review"
+      required_checks: "all-must-pass"
+      
+    deploy_dev:
+      triggers: ["push:develop"]
+      environment: "development"
+      auto_deploy: true
+      notification: "slack"
+      
+    deploy_staging:
+      triggers: ["push:staging"]
+      environment: "staging"
+      approval_required: false
+      smoke_tests: true
+      
+    deploy_production:
+      triggers: ["push:main"]
+      environment: "production"
+      approval_required: true
+      approvers: ["tech-lead", "product-owner"]
+      rollback_strategy: "automatic-on-failure"
+      health_check_timeout: "5m"
+
+# ============================================================================
+# 監控與可觀測性
+# ============================================================================
+observability:
+  metrics:
+    provider: "prometheus + grafana-cloud-free"
+    collection_interval: "15s"
+    retention: "15-days"
+    dashboards:
+      - "system-health"
+      - "api-performance"
+      - "ai-usage-cost"
+      - "user-behavior"
+      
+  logging:
+    provider: "loki + grafana-cloud-free"
+    log_level: "info"
+    structured: true
+    retention: "7-days"
+    
+  tracing:
+    enabled_in_production: false # 開源替代待評估
+    enabled_in_development: true
+    provider: "jaeger-local"
+    
+  alerting:
+    channels: ["email", "slack-webhook"]
+    rules:
+      - name: "high-error-rate"
+        condition: "error_rate > 5%"
+        severity: "critical"
+      - name: "api-latency-high"
+        condition: "p95_latency > 2s"
+        severity: "warning"
+      - name: "cost-budget-80"
+        condition: "monthly_cost > $4"
+        severity: "warning"
+
+# ============================================================================
+# 資料管理策略
+# ============================================================================
+data_management:
+  backup:
+    frequency: "daily"
+    retention: "30-days"
+    provider: "supabase-automated-backup"
+    offsite_copy: true
+    encryption: "AES-256"
+    
+  migration:
+    tool: "prisma-migrate"
+    strategy: "forward-only"
+    rollback_plan: "down-migrations-prepared"
+    testing: "required-on-staging"
+    
+  privacy:
+    gdpr_compliant: true
+    data_retention: "2-years-after-deletion"
+    encryption_at_rest: true
+    encryption_in_transit: true
+    pii_handling: "encrypted-columns"
+
+# ============================================================================
+# 成本控制與優化
+# ============================================================================
+cost_optimization:
+  monitoring: "real-time"
+  alerts:
+    - threshold: "$0.80-of-free-quota"
+      action: "notify-team"
+    - threshold: "$0.95-of-free-quota"
+      action: "throttle-non-critical-services"
+      
+  optimization_strategies:
+    - "aggressive-caching"
+    - "batch-api-calls"
+    - "compress-assets"
+    - "lazy-loading"
+    - "connection-pooling"
+    - "query-optimization"
+    
+  resource_limits:
+    max_concurrent_ai_calls: 5
+    max_file_size: "50MB"
+    max_files_per_user_month:
+      free: 0
+      starter: 20
+      professional: 100
+    rate_limiting:
+      api_requests: "100/hour/user"
+      ai_analysis: "based-on-plan"

@@ -1,0 +1,414 @@
+# 語義引擎完整配置
+# 支援零碼配置:業務人員可直接調整參數而無需修改代碼
+
+version: "2.0"
+engine_name: "Contracts-L1 Semantic Engine"
+config_last_updated: "2024-02-08"
+
+# ============================================================================
+# 向量化語義折疊配置
+# ============================================================================
+vector_folding:
+  enabled: true
+  
+  # 向量模型配置
+  embedding_model:
+    provider: "huggingface"  # huggingface | openai | cohere
+    model_name: "sentence-transformers/all-MiniLM-L6-v2"
+    model_variant: "cpu"  # cpu | gpu | quantized
+    dimension: 384
+    max_seq_length: 256
+    normalize_embeddings: true
+    
+  # 模型備援配置
+  fallback_models:
+    - provider: "huggingface"
+      model_name: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+      priority: 2
+    - provider: "openai"
+      model_name: "text-embedding-3-small"
+      priority: 3
+      api_key_source: "env:OPENAI_API_KEY"
+  
+  # 向量儲存配置
+  vector_store:
+    primary:
+      type: "pinecone"  # pinecone | qdrant | weaviate | milvus
+      config:
+        index_name: "contracts-semantic-index"
+        environment: "us-east-1-aws"
+        metric: "cosine"  # cosine | euclidean | dot_product
+        pods: 1
+        replicas: 1
+        pod_type: "p1"  # 免費方案
+    
+    fallback:
+      type: "qdrant"
+      config:
+        host: "localhost"
+        port: 6333
+        collection_name: "contracts"
+        vector_size: 384
+        distance: "Cosine"
+        on_disk: true  # 使用磁碟儲存節省記憶體
+  
+  # 文檔分塊策略
+  chunking:
+    strategy: "semantic"  # fixed | semantic | sliding_window
+    chunk_size: 512  # 字符數
+    chunk_overlap: 50
+    respect_sentence_boundary: true
+    min_chunk_size: 100
+    max_chunk_size: 1000
+    
+    # 語義分塊參數
+    semantic_params:
+      breakpoint_threshold: 0.5  # 語義相似度閾值
+      buffer_size: 1  # 前後文緩衝句子數
+  
+  # 批次處理配置
+  batch_processing:
+    enabled: true
+    batch_size: 32
+    max_workers: 4
+    queue_size: 1000
+    timeout_seconds: 30
+  
+  # 快取策略
+  caching:
+    enabled: true
+    provider: "redis"  # redis | memory | disk
+    ttl_seconds: 86400  # 24小時
+    max_cache_size_mb: 100
+    cache_key_prefix: "vec:"
+
+# ============================================================================
+# 圖結構語義折疊配置
+# ============================================================================
+graph_folding:
+  enabled: true
+  
+  # 圖資料庫配置
+  graph_database:
+    type: "neo4j"  # neo4j | arangodb | janusgraph
+    connection:
+      uri: "bolt://localhost:7687"
+      username: "neo4j"
+      password_source: "env:NEO4J_PASSWORD"
+      database: "contracts"
+      max_connection_lifetime: 3600
+      max_connection_pool_size: 50
+  
+  # 節點類型定義
+  node_types:
+    - name: "Contract"
+      properties:
+        - {name: "contract_id", type: "string", indexed: true, unique: true}
+        - {name: "title", type: "string", indexed: true}
+        - {name: "company", type: "string", indexed: true}
+        - {name: "signed_date", type: "date", indexed: true}
+        - {name: "value", type: "float"}
+        - {name: "risk_level", type: "string", indexed: true}
+        - {name: "created_at", type: "datetime"}
+    
+    - name: "Clause"
+      properties:
+        - {name: "clause_id", type: "string", indexed: true, unique: true}
+        - {name: "type", type: "string", indexed: true}
+        - {name: "category", type: "string", indexed: true}
+        - {name: "text", type: "string"}
+        - {name: "risk_score", type: "float", indexed: true}
+        - {name: "location", type: "string"}
+    
+    - name: "Company"
+      properties:
+        - {name: "company_id", type: "string", indexed: true, unique: true}
+        - {name: "name", type: "string", indexed: true}
+        - {name: "industry", type: "string", indexed: true}
+        - {name: "size", type: "string"}
+    
+    - name: "LegalTerm"
+      properties:
+        - {name: "term_id", type: "string", indexed: true, unique: true}
+        - {name: "term", type: "string", indexed: true}
+        - {name: "definition", type: "string"}
+        - {name: "category", type: "string", indexed: true}
+    
+    - name: "RiskFactor"
+      properties:
+        - {name: "factor_id", type: "string", indexed: true, unique: true}
+        - {name: "description", type: "string"}
+        - {name: "severity", type: "string", indexed: true}
+        - {name: "mitigation", type: "string"}
+  
+  # 關係類型定義
+  relationship_types:
+    - name: "CONTAINS"
+      from: "Contract"
+      to: "Clause"
+      properties:
+        - {name: "sequence", type: "integer"}
+        - {name: "page_number", type: "integer"}
+    
+    - name: "REFERENCES"
+      from: "Clause"
+      to: "LegalTerm"
+      properties:
+        - {name: "context", type: "string"}
+    
+    - name: "CONSTRAINS"
+      from: "Clause"
+      to: "Company"
+      properties:
+        - {name: "constraint_type", type: "string"}
+    
+    - name: "HAS_RISK"
+      from: "Clause"
+      to: "RiskFactor"
+      properties:
+        - {name: "confidence", type: "float"}
+    
+    - name: "SIMILAR_TO"
+      from: "Contract"
+      to: "Contract"
+      properties:
+        - {name: "similarity_score", type: "float"}
+        - {name: "similarity_basis", type: "string"}
+    
+    - name: "SIGNED_WITH"
+      from: "Contract"
+      to: "Company"
+      properties:
+        - {name: "role", type: "string"}  # party_a | party_b
+  
+  # 圖分析算法
+  graph_algorithms:
+    enabled: true
+    algorithms:
+      - name: "pagerank"
+        params: {iterations: 20, dampingFactor: 0.85}
+      - name: "community_detection"
+        params: {algorithm: "louvain"}
+      - name: "path_finding"
+        params: {algorithm: "dijkstra", max_depth: 5}
+
+# ============================================================================
+# 混合語義搜尋配置
+# ============================================================================
+hybrid_search:
+  enabled: true
+  
+  # 搜尋權重配置
+  weights:
+    vector_similarity: 0.6
+    graph_proximity: 0.3
+    text_match: 0.1
+  
+  # 融合策略
+  fusion:
+    strategy: "reciprocal_rank_fusion"  # rrf | linear_combination | learned_fusion
+    k: 60  # RRF 參數
+  
+  # 檢索參數
+  retrieval:
+    top_k: 20
+    min_score: 0.5
+    diversity_penalty: 0.2  # MMR 多樣性
+    
+  # 重排序
+  reranking:
+    enabled: true
+    model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    top_n: 10
+
+# ============================================================================
+# 實時語義索引配置
+# ============================================================================
+real_time_indexing:
+  enabled: true
+  
+  # 更新策略
+  update_strategy:
+    mode: "incremental"  # incremental | batch | hybrid
+    trigger: "on_change"  # on_change | scheduled | manual
+    
+  # 增量更新配置
+  incremental_update:
+    batch_interval_seconds: 30
+    max_batch_size: 100
+    retry_failed: true
+    max_retries: 3
+    retry_delay_seconds: 5
+  
+  # 批次更新配置
+  batch_update:
+    schedule: "0 2 * * *"  # 每天凌晨2點
+    full_reindex_interval_days: 7
+  
+  # 索引優化
+  optimization:
+    auto_optimize: true
+    optimize_threshold: 1000  # 累積變更數
+    compaction_enabled: true
+    vacuum_schedule: "0 3 * * 0"  # 每週日凌晨3點
+
+# ============================================================================
+# 語義計算引擎配置
+# ============================================================================
+semantic_computation:
+  
+  # 相似度計算
+  similarity:
+    default_metric: "cosine"
+    threshold: 0.7
+    normalize: true
+    
+    # 多級相似度
+    tiers:
+      high: {min: 0.85, label: "高度相似"}
+      medium: {min: 0.70, label: "中度相似"}
+      low: {min: 0.50, label: "低度相似"}
+  
+  # 聚類分析
+  clustering:
+    enabled: true
+    algorithm: "hdbscan"  # kmeans | dbscan | hdbscan
+    params:
+      min_cluster_size: 5
+      min_samples: 3
+    auto_tune: true
+    max_clusters: 50
+  
+  # 語義推理
+  reasoning:
+    enabled: true
+    rule_engine: "drools"  # drools | easy-rules | custom
+    rules_path: "config/business-rules/"
+    
+    # 推理規則類型
+    rule_types:
+      - "implication"  # if-then規則
+      - "constraint"   # 約束規則
+      - "derivation"   # 派生規則
+    
+    # 推理深度
+    max_inference_depth: 3
+    confidence_threshold: 0.6
+  
+  # 語義排序
+  ranking:
+    algorithm: "learning_to_rank"  # bm25 | learning_to_rank | neural
+    features:
+      - "semantic_similarity"
+      - "recency"
+      - "importance"
+      - "completeness"
+      - "user_preference"
+    
+    # 個性化排序
+    personalization:
+      enabled: true
+      weight: 0.3
+      history_window_days: 90
+
+# ============================================================================
+# 性能優化配置
+# ============================================================================
+performance:
+  
+  # 快取策略
+  caching:
+    levels:
+      - name: "l1_memory"
+        size_mb: 50
+        ttl_seconds: 300
+      - name: "l2_redis"
+        size_mb: 200
+        ttl_seconds: 3600
+      - name: "l3_disk"
+        size_mb: 1000
+        ttl_seconds: 86400
+  
+  # 並行處理
+  concurrency:
+    max_workers: 8
+    queue_type: "priority"  # fifo | priority | fair
+    timeout_seconds: 60
+  
+  # 資源限制
+  limits:
+    max_vector_dimensions: 1536
+    max_graph_depth: 10
+    max_results_per_query: 1000
+    max_concurrent_queries: 50
+
+# ============================================================================
+# 監控與日誌配置
+# ============================================================================
+monitoring:
+  
+  # 指標收集
+  metrics:
+    enabled: true
+    provider: "prometheus"
+    port: 9090
+    path: "/metrics"
+    interval_seconds: 15
+    
+    # 自定義指標
+    custom_metrics:
+      - "query_latency_ms"
+      - "index_size_mb"
+      - "cache_hit_rate"
+      - "vector_operations_per_second"
+  
+  # 日誌配置
+  logging:
+    level: "info"  # debug | info | warn | error
+    format: "json"
+    output: "stdout"
+    
+    # 日誌輪轉
+    rotation:
+      enabled: true
+      max_size_mb: 100
+      max_files: 10
+      compress: true
+  
+  # 追蹤
+  tracing:
+    enabled: false  # 生產環境關閉以節省成本
+    sampling_rate: 0.1
+    exporter: "jaeger"
+
+# ============================================================================
+# 安全性配置
+# ============================================================================
+security:
+  
+  # 資料加密
+  encryption:
+    at_rest: true
+    in_transit: true
+    algorithm: "AES-256-GCM"
+    key_rotation_days: 90
+  
+  # 存取控制
+  access_control:
+    enabled: true
+    default_policy: "deny"
+    
+    # 角色權限
+    roles:
+      - name: "admin"
+        permissions: ["read", "write", "delete", "configure"]
+      - name: "analyst"
+        permissions: ["read", "write"]
+      - name: "viewer"
+        permissions: ["read"]
+  
+  # 審計日誌
+  audit:
+    enabled: true
+    log_all_queries: false  # 僅記錄敏感操作
+    retention_days: 90

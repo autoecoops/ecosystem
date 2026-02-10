@@ -1,4 +1,8 @@
 {
+  "name": "contracts-l1-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Contracts L1 Multi-Platform Monorepo - 支持多平台並行建置和部署",
   "name": "contracts-l1",
   "private": true,
   "version": "0.1.0",
@@ -10,6 +14,13 @@
   "packageManager": "pnpm@8.15.0",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:platform-1": "cd platforms/platform-1 && pnpm run dev",
+    "dev:api": "cd platforms/platform-1 && pnpm run dev:api",
+    "dev:web": "cd platforms/platform-1 && pnpm run dev:web",
+    "build": "turbo run build",
+    "build:platform-1": "cd platforms/platform-1 && pnpm run build",
+    "build:api": "cd platforms/platform-1 && pnpm run build:api",
+    "build:web": "cd "platforms/platform-1" && pnpm run build:web",
     "dev:web": "turbo run dev --filter=@contracts-l1/web",
     "dev:api": "turbo run dev --filter=@contracts-l1/api",
     "build": "turbo run build",
@@ -30,6 +41,33 @@
     "db:seed": "pnpm -C packages/database run seed",
     "docker:dev": "docker compose -f docker/docker-compose.dev.yml up -d",
     "docker:down": "docker compose -f docker/docker-compose.dev.yml down",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:migrate": "cd platforms/platform-1 && pnpm run db:migrate",
+    "db:seed": "cd platforms/platform-1 && pnpm run db:seed",
+    "db:studio": "cd platforms/platform-1 && pnpm run db:studio",
+    "docker:dev": "cd platforms/platform-1 && pnpm run docker:dev",
+    "docker:down": "cd platforms/platform-1 && pnpm run docker:down",
+    "setup:platform-1": "cd platforms/platform-1 && pnpm run setup",
+    "analyze:bundle": "turbo run analyze:bundle"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.2.4",
+    "turbo": "^1.12.0",
+    "typescript": "^5.3.3"
+;"
+  },
+  "pnpm": {
+    "overrides": {
+      "axios": ">=1.6.0"
+    }
+  }
+}
     "governance:seal": "turbo run seal",
     "clean": "turbo run clean && rm -rf node_modules",
     "setup": "bash scripts/setup/setup-dev.sh"
