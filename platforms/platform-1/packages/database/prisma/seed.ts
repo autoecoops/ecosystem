@@ -7,6 +7,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
 
+  // Ensure we're in a development environment
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Seed script should not be run in production environment');
+  }
+
   // Clean database
   await prisma.user.deleteMany();
   await prisma.contract.deleteMany();
@@ -15,8 +20,7 @@ async function main() {
   await prisma.notification.deleteMany();
 
   // Create demo user with bcrypt hash
-  // NOTE: Use SEED_PASSWORD env var to set password, defaults to a development-only password
-  // Never use the default password in production environments
+  // NOTE: Set SEED_PASSWORD env var to customize password for seeded users
   const seedPassword = process.env.SEED_PASSWORD || 'DevOnly_P@ssw0rd123!';
   const passwordHash = await bcrypt.hash(seedPassword, 10);
   
@@ -77,8 +81,9 @@ async function main() {
   console.log('Created analysis');
 
   console.log('Seed completed successfully!');
-  console.log(`Demo user: demo@contracts-l1.com / ${seedPassword}`);
-  console.log(`Admin user: admin@contracts-l1.com / ${seedPassword}`);
+  console.log('Demo user: demo@contracts-l1.com');
+  console.log('Admin user: admin@contracts-l1.com');
+  console.log('Password: Set via SEED_PASSWORD env var or using default development password');
 }
 
 main()
