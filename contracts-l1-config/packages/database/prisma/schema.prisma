@@ -1,0 +1,281 @@
+// Contracts-L1 資料庫 Schema
+// 使用 Prisma ORM 定義資料模型
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// 使用者與認證模型
+// ============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?  // null for OAuth users
+  company   String?
+  
+  // 訂閱資訊
+  subscriptionPlan SubscriptionPlan @default(FREE)
+  monthlyQuota     Int              @default(0)
+  usedQuota        Int              @default(0)
+  quotaResetAt     DateTime?
+  
+  // OAuth 資訊
+  googleId  String?  @unique
+  githubId  String?  @unique
+  
+  // 元數據
+  emailVerified    Boolean  @default(false)
+  emailVerifiedAt  DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // 關聯
+  contracts       Contract[]
+  refreshTokens   RefreshToken[]
+  apiKeys         ApiKey[]
+  
+  @@index([email])
+  @@index([subscriptionPlan])
+  @@map("users")
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  name      String
+  key       String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime @default(now())
+  
+  @@index([userId])
+  @@index([key])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// 契約管理模型
+// ============================================================================
+
+model Contract {
+  id               String         @id @default(cuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 檔案資訊
+  originalFileName String
+  fileSize         Int
+  mimeType         String
+  s3Key            String         @unique
+  
+  // 提取的文字內容
+  extractedText    String?        @db.Text
+  
+  // 狀態
+  status           ContractStatus @default(UPLOADING)
+  errorMessage     String?
+  
+  // 元數據
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  
+  // 關聯
+  analysis         ContractAnalysis?
+  
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("contracts")
+}
+
+enum ContractStatus {
+  UPLOADING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ============================================================================
+// AI 分析結果模型
+// ============================================================================
+
+model ContractAnalysis {
+  id               String       @id @default(cuid())
+  contractId       String       @unique
+  contract         Contract     @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  
+  // 分析結果
+  overallRiskLevel RiskLevel
+  confidence       Int          // 0-100
+  clauses          Json         // 條款清單 (JSON array)
+  summary          String       @db.Text
+  keyFindings      String[]     // 關鍵發現
+  recommendations  String[]     // 建議事項
+  
+  // AI 模型資訊
+  modelUsed        String
+  modelVersion     String?
+  tokensUsed       Int?
+  processingTimeMs Int?
+  
+  // 元數據
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  
+  @@index([contractId])
+  @@index([overallRiskLevel])
+  @@map("contract_analyses")
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// ============================================================================
+// 語義向量模型
+// ============================================================================
+
+model SemanticChunk {
+  id         String   @id @default(cuid())
+  contractId String
+  
+  // 文字內容
+  text       String   @db.Text
+  chunkIndex Int      // 在契約中的順序
+  
+  // 向量資訊 (實際向量儲存在 Pinecone/Qdrant)
+  vectorId   String   @unique  // Pinecone/Qdrant 中的 ID
+  embedding  String?  @db.Text // 可選:儲存向量的 JSON 表示
+  
+  // 元數據
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  
+  @@index([contractId])
+  @@index([vectorId])
+  @@map("semantic_chunks")
+}
+
+// ============================================================================
+// 使用量追蹤模型
+// ============================================================================
+
+model UsageRecord {
+  id         String      @id @default(cuid())
+  userId     String
+  
+  // 使用類型
+  type       UsageType
+  
+  // 資源消耗
+  tokensUsed Int?
+  apiCalls   Int         @default(1)
+  costUsd    Float?      // 成本(美元)
+  
+  // 關聯資源
+  contractId String?
+  
+  // 元數據
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([type])
+  @@map("usage_records")
+}
+
+enum UsageType {
+  CONTRACT_UPLOAD
+  AI_ANALYSIS
+  SEMANTIC_SEARCH
+  EXPORT_PDF
+  API_CALL
+}
+
+// ============================================================================
+// 通知模型
+// ============================================================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  
+  // 通知內容
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  link      String?
+  
+  // 狀態
+  read      Boolean          @default(false)
+  readAt    DateTime?
+  
+  // 元數據
+  metadata  Json?
+  createdAt DateTime         @default(now())
+  
+  @@index([userId, read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  ANALYSIS_COMPLETE
+  ANALYSIS_FAILED
+  QUOTA_WARNING
+  QUOTA_EXCEEDED
+  SYSTEM_UPDATE
+  SECURITY_ALERT
+}
+
+// ============================================================================
+// 系統配置模型
+// ============================================================================
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  category  String
+  
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  
+  @@index([category])
+  @@map("system_configs")
+}
