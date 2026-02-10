@@ -122,7 +122,7 @@ log_success "PostgreSQL 已就緒"
 log_info "執行資料庫遷移..."
 cd packages/database
 pnpm run generate
-pnpm run migrate:dev
+pnpm run migrate
 cd ../..
 log_success "資料庫遷移完成"
 
@@ -136,12 +136,6 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     cd ../..
     log_success "測試數據載入完成"
 fi
-
-# 構建共享套件
-log_info "構建共享套件..."
-pnpm run build --filter=@contracts-l1/shared
-pnpm run build --filter=@contracts-l1/ui
-log_success "共享套件構建完成"
 
 # 顯示服務訊息
 echo ""
@@ -169,5 +163,5 @@ echo "  • pnpm run dev:api      - 只啟動 API"
 echo "  • pnpm run db:studio    - 開啟資料庫管理介面"
 echo "  • pnpm run docker:down  - 停止 Docker 服務"
 echo ""
-log_info "如遇到問題，請查看文檔: docs/development/troubleshooting.md"
+log_info "如遇到問題，請查看項目文檔或開啟 Issue"
 echo ""

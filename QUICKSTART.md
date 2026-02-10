@@ -101,13 +101,13 @@ Admin 用戶: admin@contracts-l1.com / password123
 
 ## 📚 下一步
 
-1. 查看 [架構文檔](docs/architecture/system-design.md)
-2. 閱讀 [開發指南](docs/development/setup.md)
-3. 參考 [API 文檔](docs/api/openapi.yml)
+1. 查閱 [架構演進指南](docs/architecture/evolution-guide.md) 了解系統架構
+2. 查閱 [零成本部署指南](docs/deployment/zero-cost-deployment-guide.md) 了解部署選項
+3. 開始開發您的功能
 
 ## 🐛 遇到問題?
 
-查看 [故障排除指南](docs/development/troubleshooting.md) 或開啟 Issue。
+請開啟 Issue 或查看項目文檔以獲得幫助。
 
 ## 🎉 開始開發
 

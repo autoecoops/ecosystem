@@ -1,4 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
   "compilerOptions": {
     "target": "ES2022",
     "module": "commonjs",
@@ -8,6 +10,13 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs"
+  }
+}
     "moduleResolution": "node",
     "declaration": true,
     "declarationMap": true,
