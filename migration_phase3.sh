@@ -9,7 +9,7 @@ cd /workspace/autoecosystem-main
 # 1. Move root documentation files
 echo "Moving root documentation files..."
 mkdir -p docs/{architecture,configuration,quickstart}
-[ -f ARCHITECTURE_COMPLETENESS_CHECKLIST.md ] && mv ARCHITECTURE_COMPLETENESS_CHECKLIST.md docs/architecture/COMPLETENSISH_CHECKLIST.md
+[ -f ARCHITECTURE_COMPLETENESS_CHECKLIST.md ] && mv ARCHITECTURE_COMPLETENESS_CHECKLIST.md docs/architecture/COMPLETENESS_CHECKLIST.md
 [ -f CONFIGURATION_VERIFICATION_REPORT.md ] && mv CONFIGURATION_VERIFICATION_REPORT.md docs/configuration/VERIFICATION_REPORT.md
 [ -f QUICKSTART.md ] && mv QUICKSTART.md docs/quickstart/QUICKSTART.md
 
@@ -81,7 +81,8 @@ echo "Verifying environment config..."
 if [ -f control/environment/configs/.env.example ]; then
     echo "Environment config already moved"
 else
-    cp .env Cathedral
+    mkdir -p control/environment/configs
+    [ -f .env.example ] && cp .env.example control/environment/configs/.env.example
     echo "WARNING: Check environment config migration"
 fi
 

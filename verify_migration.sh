@@ -4,7 +4,9 @@ echo "=== Migration Verification Script ==="
 echo "Verifying all files have been moved correctly..."
 echo ""
 
-cd /workspace/autoecosystem-main
+# Dynamically resolve repository root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
 # Counters
 total_found=0
@@ -87,10 +89,10 @@ if [ -d interfaces/apps ]; then
         echo "   ✓ api app found"
         ((total_found++))
     else
-        "   ✗ api app missing"
+        echo "   ✗ api app missing"
         ((total_missing++))
     fi
-    if [ -d "interfaces/apps并发/apps/web" ]; then
+    if [ -d "interfaces/apps/web" ]; then
         echo "   ✓ web app found"
         ((total_found++))
     else
@@ -130,10 +132,10 @@ if [ -d control/governance/scripts ]; then
         ((total_missing++))
     fi
     if [ -f "control/governance/scripts/seal-ai-change.sh" ]; then
-        echo "   ✓ seal-ai.json found"
+        echo "   ✓ seal-ai-change.sh found"
         ((total_found++))
     else
-        echo "   ✗ seal-ai.sh missing"
+        echo "   ✗ seal-ai-change.sh missing"
         ((total_missing++))
     fi
 else
@@ -193,7 +195,7 @@ if [ -d platforms/platform-1 ]; then
         echo "   ✓ packages/ found"
         ((total_found++))
     else
-        echo "   ✓ packages/ missing"
+        echo "   ✗ packages/ missing"
         ((total_missing++))
     fi
 else
@@ -258,6 +260,6 @@ if [ $total_missing -eq 0 ] && [ $total_duplicates -eq 0 ]; then
 else
     echo "✗ Migration verification FAILED"
     echo "   Missing components: $total_missing"
-    echo=>   "   Duplicates remaining: $total_duplicates"
+    echo "   Duplicates remaining: $total_duplicates"
     exit 1
 fi

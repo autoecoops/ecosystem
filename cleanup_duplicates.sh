@@ -15,7 +15,7 @@ if [ "$confirm" != "yes" ]; then
     exit 0
 fi
 
-cd /workspace/autoecososystem-main
+cd /workspace/autoecosystem-main
 
 echo "=== Phase 1: Remove contracts-l1-config directory (duplicate of platform-1/config) ==="
 if [ -d contracts-l1-config ]; then
