@@ -1,0 +1,13 @@
+{
+  "name": "contracts-l1-root",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "governance:seal": "turbo run seal"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}
