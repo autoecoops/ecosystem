@@ -44,7 +44,7 @@
     "@supabase/supabase-js": "^2.58.0",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
+    "@types/react-dom": "19.2.3",
     "@webcontainer/api": "^1.2.0",
     "autoprefixer": "10.4.24",
     "cheerio": "^1.0.0-rc.12",
