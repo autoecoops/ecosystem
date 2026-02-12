@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 function getGroqClient() {
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey || apiKey.trim() === '') {
+  if (!apiKey) {
     throw new Error('GROQ_API_KEY environment variable is not set or is empty');
   }
   return new Groq({ apiKey });

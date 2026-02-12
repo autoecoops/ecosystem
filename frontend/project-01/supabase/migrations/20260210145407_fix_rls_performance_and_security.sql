@@ -50,4 +50,4 @@ CREATE POLICY "Users can delete own projects"
   USING (user_id = (select auth.uid()));
 
 -- Fix function search paths for security
-ALTER FUNCTION update_updated_at_column() SET search_path = '';
+ALTER FUNCTION update_updated_at_column() SET search_path = pg_catalog, public;
