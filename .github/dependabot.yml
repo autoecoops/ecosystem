@@ -1,0 +1,52 @@
+# .github/dependabot.yml
+# AutoEcoOps — 讓 AI 代理未來可以審核所有依賴更新
+
+version: 2
+updates:
+
+  # 1. GitHub Actions（最重要，每天檢查工作流）
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "auto-merge"
+
+  # 2. npm（前端用，如果你在 frontend/ 裡有 package.json）
+  - package-ecosystem: "npm"
+    directory: "/frontend"      # ← 注意這裡改成 /frontend
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    groups:
+      production:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+    labels:
+      - "dependencies"
+      - "npm"
+      - "auto-merge"
+
+  # 3. Python（未來跑 OpenHands、Aider、EvoAgentX 時會用到）
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+      - "auto-merge"
+
+  # 4. Docker（未來跑虛擬機時會用到）
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "auto-merge"
