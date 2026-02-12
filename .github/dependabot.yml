@@ -1,0 +1,75 @@
+# dependabot.yml for autoecoops/autoecoops
+# 全自建構 AI 平台 — 依賴更新也應自主演化
+version: 2
+updates:
+  # 1. GitHub Actions 自身更新（工作流依賴）
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "auto-merge"
+
+  # 2. npm / Node.js（若前端或後端使用 JavaScript/TypeScript）
+  - package-ecosystem: "npm"
+    directory: "/"                # 若 package.json 在根目錄
+    schedule:
+      interval: "daily"
+    versioning-strategy: increase
+    open-pull-requests-limit: 10
+    groups:
+       production-dependencies:
+          dependency-type: "production"
+          update-types: ["minor", "patch"]
+       development-dependencies:
+          dependency-type: "development"
+          update-types: ["minor", "patch"]
+    labels:
+      - "dependencies"
+      - "npm"
+      - "auto-merge"
+
+  # 3. Python (pip) — 若存在 requirements.txt / setup.py 等
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+      - "auto-merge"
+
+  # 4. Docker — 若使用自定義 Dockerfile
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "auto-merge"
+
+  # 5. Go modules — 若後端以 Golang 開發
+  # - package-ecosystem: "gomod"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "daily"
+  #   labels:
+  #     - "dependencies"
+  #     - "go"
+  #     - "auto-merge"
+
+  # 6. Rust (Cargo) — 預留，若有使用
+  # - package-ecosystem: "cargo"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
+  #   labels:
+  #     - "dependencies"
+  #     - "rust"
+
+  # 7. 其他生態系：composer (PHP), bundler (Ruby), gradle/maven (Java) 等請依實際情況加入
