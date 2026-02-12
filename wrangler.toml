@@ -1,0 +1,23 @@
+name = "autoecoops-ecosystem"
+type = "javascript"
+account_id = ""
+workers_dev = true
+route = ""
+zone_id = ""
+
+# Build configuration for Cloudflare Pages
+[build]
+command = "cd frontend/project-01 && pnpm install && pnpm run build"
+cwd = "."
+watch_paths = ["frontend/project-01/**/*.{ts,tsx,js,jsx,json}"]
+
+# Output directory configuration
+[build.upload]
+format = "service-worker"
+
+# Environment variables
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.staging]
+vars = { ENVIRONMENT = "staging" }

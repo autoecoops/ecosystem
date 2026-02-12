@@ -13,7 +13,9 @@
     "dev:platform-1": "cd platforms/platform-1 && pnpm run dev",
     "dev:api": "cd platforms/platform-1 && pnpm run dev:api",
     "dev:web": "cd platforms/platform-1 && pnpm run dev:web",
+    "dev:frontend": "cd frontend/project-01 && pnpm run dev",
     "build": "turbo run build",
+    "build:frontend": "cd frontend/project-01 && pnpm run build",
     "build:platform-1": "cd platforms/platform-1 && pnpm run build",
     "build:api": "cd platforms/platform-1 && pnpm run build:api",
     "build:web": "cd platforms/platform-1 && pnpm run build:web",
@@ -51,6 +53,9 @@
     "prettier": "^3.8.1",
     "turbo": "^2.8.7",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "next": "^15.0.8"
   },
   "pnpm": {
     "overrides": {
