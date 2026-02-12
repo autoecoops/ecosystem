@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS agent_tasks (
   task_type text NOT NULL,
   input jsonb DEFAULT '{}',
   output jsonb DEFAULT '{}',
-  status text NOT NULL DEFAULT 'queued',
+  status text NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'running', 'completed', 'failed')),
   started_at timestamptz,
   completed_at timestamptz,
   created_at timestamptz DEFAULT now(),
@@ -60,11 +60,20 @@ CREATE POLICY "Users can delete own agent tasks"
   TO authenticated
   USING (user_id = (select auth.uid()));
 
--- Create updated_at trigger
-CREATE TRIGGER update_agent_tasks_updated_at
-  BEFORE UPDATE ON agent_tasks
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+-- Create updated_at trigger (function already exists from earlier migration)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_proc WHERE proname = 'update_updated_at_column'
+  ) THEN
+    EXECUTE '
+      CREATE TRIGGER update_agent_tasks_updated_at
+        BEFORE UPDATE ON agent_tasks
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column()
+    ';
+  END IF;
+END $$;
 
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_agent_tasks_user_id ON agent_tasks(user_id);

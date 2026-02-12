@@ -33,7 +33,7 @@ BEGIN
     -- Only move the extension if it is not already in the extensions schema
     IF current_schema IS DISTINCT FROM 'extensions' THEN
       -- Create the target schema if it does not already exist
-      EXECUTE 'CREATE SCHEMA IF NOT EXISTS extensions';
+      CREATE SCHEMA IF NOT EXISTS extensions;
       -- Move vector extension to the extensions schema
       EXECUTE 'ALTER EXTENSION vector SET SCHEMA extensions';
     END IF;
