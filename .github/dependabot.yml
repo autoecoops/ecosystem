@@ -13,7 +13,6 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
-      - "auto-merge"
 
   # 2. npm（前端用，如果你在 frontend/ 裡有 package.json）
   - package-ecosystem: "npm"
@@ -27,8 +26,6 @@ updates:
         update-types: ["minor", "patch"]
     labels:
       - "dependencies"
-      - "npm"
-      - "auto-merge"
 
   # 3. Python（未來跑 OpenHands、Aider、EvoAgentX 時會用到）
   - package-ecosystem: "pip"
@@ -39,7 +36,6 @@ updates:
     labels:
       - "dependencies"
       - "python"
-      - "auto-merge"
 
   # 4. Docker（未來跑虛擬機時會用到）
   - package-ecosystem: "docker"
@@ -49,4 +45,3 @@ updates:
     labels:
       - "dependencies"
       - "docker"
-      - "auto-merge"
