@@ -73,7 +73,8 @@ temp/
 *.tmp
 
 # Package manager
-pnpm-lock.yaml
+# pnpm-lock.yaml is committed to version control for reproducible builds
+# pnpm-lock.yaml
 yarn.lock
 package-lock.json
 
