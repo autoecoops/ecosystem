@@ -1,0 +1,19 @@
+# harbor-image-policy.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: HarborImageSource
+metadata:
+  name: arduino-harbor-policy
+spec:
+  enforcementAction: warn
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    - apiGroups: ["apps"]
+      kinds: ["Deployment", "ReplicaSet", "DaemonSet", "StatefulSet"]
+    excludedNamespaces: ["kube-system", "gatekeeper-system", "cert-manager"]
+  parameters:
+    allowedRegistries:
+    - "harbor.axiom.internal/arduino-production/"
+    - "harbor.axiom.internal/base/"
+    requireSigned: true

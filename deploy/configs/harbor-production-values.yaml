@@ -1,0 +1,37 @@
+# harbor-production-values.yaml
+expose:
+  type: ingress
+  tls:
+    enabled: true
+    certSource: secret
+    secret:
+      secretName: harbor-tls-cert
+  ingress:
+    hosts:
+      core: harbor.axiom.internal
+    controller: nginx
+
+# High Availability Configuration
+portal:
+  replicas: 3
+core:
+  replicas: 3
+jobservice:
+  replicas: 3
+registry:
+  replicas: 3
+
+# Trivy Configuration for Vulnerability Scanning
+trivy:
+  enabled: true
+  vulnType: "os,library"
+  severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+  ignoreUnfixed: false
+
+# Enable metrics for monitoring
+metrics:
+  enabled: true
+  core:
+    port: 8001
+  registry:
+    port: 8001

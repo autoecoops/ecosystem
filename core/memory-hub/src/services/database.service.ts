@@ -47,20 +47,22 @@ export async function initDatabase(): Promise<void> {
     `);
 
     // Create chunks table with vector column
-    // Using validated config values - dimensions is integer, version is alphanumeric
+    // Dimensions validated as positive integer above; version validated as alphanumeric
+    const VECTOR_DIM = Number(config.EMBEDDING_DIMENSIONS);
+    const MODEL_VER = String(config.EMBEDDING_MODEL_VERSION);
     await client.query(`
       CREATE TABLE IF NOT EXISTS document_chunks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
         content TEXT NOT NULL,
-        embedding vector(${config.EMBEDDING_DIMENSIONS}),
+        embedding vector(${VECTOR_DIM}),
         chunk_index INTEGER NOT NULL,
         total_chunks INTEGER NOT NULL,
-        model_version TEXT NOT NULL DEFAULT '${config.EMBEDDING_MODEL_VERSION}',
+        model_version TEXT NOT NULL DEFAULT $1,
         metadata JSONB DEFAULT '{}',
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
-    `);
+    `, [MODEL_VER]);
 
     // Create vector similarity index (IVFFlat for production scale)
     await client.query(`

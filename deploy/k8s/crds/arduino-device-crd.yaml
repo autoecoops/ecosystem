@@ -1,0 +1,119 @@
+# arduino-device-crd.yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: arduinodevices.devices.axiom.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+spec:
+  group: devices.axiom.io
+  names:
+    kind: ArduinoDevice
+    listKind: ArduinoDeviceList
+    plural: arduinodevices
+    singular: arduinodevice
+    shortNames: ["ard", "arduino"]
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+      scale:
+        specReplicasPath: .spec.replicas
+        statusReplicasPath: .status.replicas
+        labelSelectorPath: .status.selector
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              deviceType:
+                type: string
+                enum: ["uno", "mega", "nano", "esp32", "esp8266"]
+                description: "Arduino board type"
+              firmware:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    pattern: '^v\d+\.\d+\.\d+$'
+                  image:
+                    type: string
+                  checksum:
+                    type: string
+                    pattern: '^[a-fA-F0-9]{64}$'
+                required: ["version", "image"]
+              connectivity:
+                type: object
+                properties:
+                  protocol:
+                    type: string
+                    enum: ["wifi", "bluetooth", "lora", "cellular"]
+                  endpoint:
+                    type: string
+                    format: uri
+                  credentials:
+                    type: object
+                    properties:
+                      secretRef:
+                        type: object
+                        properties:
+                          name: {type: string}
+                          key: {type: string}
+                        required: ["name", "key"]
+              sensors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name: {type: string}
+                    type:
+                      type: string
+                      enum: ["temperature", "humidity", "pressure", "motion", "light", "sound"]
+                    pin: {type: integer, minimum: 0, maximum: 53}
+                    sampleRate: {type: string, default: "30s"}
+                  required: ["name", "type", "pin"]
+              replicas: {type: integer, minimum: 1, maximum: 100, default: 1}
+            required: ["deviceType", "firmware"]
+          status:
+            type: object
+            properties:
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: ["Ready", "Progressing", "Degraded", "Available"]
+                    status:
+                      type: string
+                      enum: ["True", "False", "Unknown"]
+                    lastTransitionTime: {type: string, format: date-time}
+                    reason: {type: string}
+                    message: {type: string}
+                  required: ["type", "status"]
+              replicas: {type: integer}
+              readyReplicas: {type: integer}
+              observedGeneration: {type: integer}
+              phase:
+                type: string
+                enum: ["Pending", "Running", "Failed", "Succeeded"]
+              lastUpdateTime: {type: string, format: date-time}
+    additionalPrinterColumns:
+    - name: Type
+      type: string
+      jsonPath: .spec.deviceType
+    - name: Replicas
+      type: integer
+      jsonPath: .spec.replicas
+    - name: Ready
+      type: integer
+      jsonPath: .status.readyReplicas
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

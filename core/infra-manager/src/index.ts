@@ -16,7 +16,6 @@ app.use(cors({
   origin: allowedOrigins?.split(',') ?? '*',
   credentials: Boolean(allowedOrigins),
 }));
-app.use(cors({ origin: allowedOrigins, credentials: allowedOrigins !== '*' }));
 app.use(express.json({ limit: '1mb' }));
 app.use(compression());
 app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url === '/health' } }));

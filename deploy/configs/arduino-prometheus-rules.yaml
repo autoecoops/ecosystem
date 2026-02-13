@@ -1,0 +1,30 @@
+# arduino-prometheus-rules.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: arduino-alert-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: arduino-devices
+    interval: 30s
+    rules:
+    - alert: ArduinoDeviceDown
+      expr: up{job="arduino-devices"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: arduino
+      annotations:
+        summary: "Arduino device {{ $labels.arduino_device }} is down"
+        description: "Arduino device {{ $labels.arduino_device }} at {{ $labels.location }} has been unreachable for more than 5 minutes."
+        
+    - alert: ArduinoDeviceHighCPU
+      expr: 100 - (avg by (arduino_device) (rate(node_cpu_seconds_total{mode="idle",job="arduino-devices"}[5m])) * 100) > 80
+      for: 10m
+      labels:
+        severity: warning
+        team: arduino
+      annotations:
+        summary: "High CPU usage on Arduino device {{ $labels.arduino_device }}"
+        description: "CPU usage is above 80% for Arduino device {{ $labels.arduino_device }}"
