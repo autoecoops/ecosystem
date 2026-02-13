@@ -11,9 +11,10 @@ import platformRoutes from './routes/platform.routes';
 const app = express();
 
 app.use(helmet());
+const allowedOrigins = process.env.ALLOWED_ORIGINS;
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') ?? '*',
-  credentials: Boolean(process.env.ALLOWED_ORIGINS),
+  origin: allowedOrigins?.split(',') ?? '*',
+  credentials: Boolean(allowedOrigins),
 }));
 app.use(express.json({ limit: '5mb' }));
 app.use(compression());
