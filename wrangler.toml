@@ -1,23 +1,15 @@
 name = "autoecoops-ecosystem"
-type = "javascript"
-account_id = ""
-workers_dev = true
-route = ""
-zone_id = ""
+compatibility_date = "2025-12-01"
+compatibility_flags = ["nodejs_compat"]
 
-# Build configuration for Cloudflare Pages
+# Cloudflare Pages build configuration
 [build]
-command = "cd frontend/project-01 && pnpm install && pnpm run build"
+command = "cd frontend/project-01 && npm install && npm run build:cf"
 cwd = "."
-watch_paths = ["frontend/project-01/**/*.{ts,tsx,js,jsx,json}"]
+watch_paths = ["frontend/project-01/**/*.{ts,tsx,js,jsx,json,css}"]
 
-# Output directory configuration
-[build.upload]
-format = "service-worker"
-
-# Environment variables
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
-[env.staging]
-vars = { ENVIRONMENT = "staging" }
+[env.preview]
+vars = { ENVIRONMENT = "preview" }
