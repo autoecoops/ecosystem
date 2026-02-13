@@ -1,0 +1,9 @@
+name = "autoecoops-frontend"
+compatibility_date = "2025-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages will use the output from open-next build
+pages_build_output_dir = ".open-next/assets"
+
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = "https://yrfxijooswpvdpdseswy.supabase.co"
