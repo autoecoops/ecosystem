@@ -14,6 +14,14 @@ const app = express();
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',');
 app.use(helmet());
 app.use(cors({ origin: allowedOrigins ?? '*', credentials: Boolean(allowedOrigins) }));
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') ?? '*';
+app.use(helmet());
+app.use(cors({ origin: allowedOrigins, credentials: allowedOrigins !== '*' }));
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',');
+app.use(cors({
+  origin: allowedOrigins ?? '*',
+  credentials: Boolean(allowedOrigins),
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(compression());
 app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url === '/health' } }));

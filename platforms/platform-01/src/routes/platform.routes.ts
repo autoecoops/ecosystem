@@ -1,10 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { evaluateSLOs } from '../observers/slo.observer';
-import { processAlert, executeHealingAction } from '../healers/healing.engine';
+import { processAlert, executeHealingAction, type HealingActionType } from '../healers/healing.engine';
 import { writeAudit, publishEvent } from '../services/core-client.service';
 import { logger } from '../services/logger.service';
-import type { ApiResponse } from '@autoecops/shared-types';
 
 const router = Router();
 
@@ -113,7 +112,7 @@ router.post('/heal', async (req: Request, res: Response): Promise<void> => {
 
   const action = {
     id: uuidv4(),
-    type: type as any,
+    type: type as HealingActionType,
     target,
     reason,
     severity: 'medium' as const,

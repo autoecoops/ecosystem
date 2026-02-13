@@ -107,8 +107,7 @@ spec:
         - namespaceSelector:
             matchLabels:
               app.kubernetes.io/part-of: autoecops-ecosystem
-    - to: []
-      ports:
+    - ports:
         - protocol: TCP
           port: 443
         - protocol: TCP

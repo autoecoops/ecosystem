@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import type { HealthCheck } from '@autoecops/shared-types';
+import { config } from '../config';
 
 const router = Router();
 const startTime = Date.now();
@@ -9,7 +10,7 @@ router.get('/health', (_req: Request, res: Response): void => {
 
   const health: HealthCheck = {
     status: 'healthy',
-    version: '1.0.0',
+    version: config.VERSION,
     uptime: uptimeMs,
     timestamp: new Date().toISOString(),
     checks: {

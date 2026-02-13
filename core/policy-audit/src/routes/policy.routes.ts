@@ -5,7 +5,7 @@ import { evaluatePolicy, evaluateBuiltinPolicy } from '../engine/opa.engine';
 import { writeAuditEntry, queryAuditEntries } from '../services/audit.store';
 import { generateSOC2Report, generateISO27001Report } from '../reports/compliance.report';
 import { logger } from '../services/logger.service';
-import type { ApiResponse, AuditEntry } from '@autoecops/shared-types';
+import type { AuditEntry } from '@autoecops/shared-types';
 
 const router = Router();
 

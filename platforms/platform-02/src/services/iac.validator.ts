@@ -83,7 +83,11 @@ export function validateKubernetesManifest(manifest: Record<string, unknown>): V
           severity: 'warning',
         });
       } else {
-        if (secCtx.runAsRoot === true || secCtx.privileged === true) {
+        if (
+          secCtx.runAsNonRoot === false ||
+          secCtx.runAsUser === 0 ||
+          secCtx.privileged === true
+        ) {
           errors.push({
             path: `spec.containers[${container.name}].securityContext`,
             message: 'Container must not run as root or privileged',

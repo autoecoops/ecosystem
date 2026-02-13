@@ -19,6 +19,14 @@ const agentRegistry = new Map<string, EdgeAgent>();
 let heartbeatInterval: NodeJS.Timeout | null = null;
 
 export function registerAgent(agent: EdgeAgent): void {
+  // Ensure lastHeartbeat is set to now if not provided or invalid
+  if (!agent.lastHeartbeat || isNaN(new Date(agent.lastHeartbeat).getTime())) {
+    agent.lastHeartbeat = new Date().toISOString();
+  }
+  // Set initial status if not provided
+  if (!agent.status) {
+    agent.status = 'online';
+  }
   agentRegistry.set(agent.agentId, agent);
   logger.info({ agentId: agent.agentId, hostname: agent.hostname }, 'Edge agent registered');
 }
@@ -49,6 +57,14 @@ function checkAgentHealth(): void {
 
   for (const [agentId, agent] of agentRegistry) {
     const lastBeat = new Date(agent.lastHeartbeat).getTime();
+    
+    // Treat invalid/missing timestamp as immediately offline
+    if (isNaN(lastBeat)) {
+      agent.status = 'offline';
+      logger.warn({ agentId, hostname: agent.hostname }, 'Edge agent has invalid lastHeartbeat, marking offline');
+      continue;
+    }
+
     const elapsed = now - lastBeat;
 
     if (elapsed > timeoutMs && agent.status !== 'offline') {

@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../config';
 import { logger } from '../services/logger.service';
-import type { DomainEvent, AuditEntry } from '@autoecops/shared-types';
 
 // ============================================================================
 // Healing Action Types

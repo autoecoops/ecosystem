@@ -54,12 +54,19 @@ router.post('/deploy', async (req: Request, res: Response): Promise<void> => {
 
   const validEnvironments = ['development', 'staging', 'production'] as const;
   if (!validEnvironments.includes(environment as typeof validEnvironments[number])) {
+  const validEnvironments = ['development', 'staging', 'production'];
+  if (!validEnvironments.includes(environment)) {
     res.status(400).json({ success: false, error: { code: 'INVALID_ENVIRONMENT', message: 'environment must be one of: development, staging, production' } });
     return;
   }
 
   try {
     const result = await triggerDeployment({ application, environment: environment as 'development' | 'staging' | 'production', imageTag });
+    const result = await triggerDeployment({ 
+      application, 
+      environment: environment as 'development' | 'staging' | 'production', 
+      imageTag 
+    });
     res.status(202).json({
       success: true, data: result,
       meta: { requestId: uuidv4(), traceId: (req.headers['x-trace-id'] as string) ?? uuidv4(), timestamp: new Date().toISOString() },

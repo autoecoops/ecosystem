@@ -59,13 +59,13 @@ export class EcosystemClient {
     let lastError: Error | undefined;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(
-          () => controller.abort(),
-          options.timeout ?? this.config.timeout,
-        );
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        options.timeout ?? this.config.timeout,
+      );
 
+      try {
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
           ...tracing.toHeaders(),
@@ -82,8 +82,6 @@ export class EcosystemClient {
           signal: controller.signal,
         });
 
-        clearTimeout(timeoutId);
-
         if (!response.ok) {
           const errorBody = await response.text();
           let parsed: { error?: { code?: string; message?: string } } = {};
@@ -98,11 +96,13 @@ export class EcosystemClient {
         }
 
         // Handle 204 No Content and empty responses
+        // Handle 204 No Content or empty responses
         if (response.status === 204 || response.headers.get('content-length') === '0') {
           return undefined as T;
         }
 
         // Check content-type before parsing JSON
+        // Check Content-Type before parsing JSON
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           return (await response.json()) as T;
@@ -110,6 +110,8 @@ export class EcosystemClient {
 
         // For non-JSON responses, return text
         return (await response.text()) as unknown as T;
+        // For non-JSON responses, return undefined
+        return undefined as T;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -121,13 +123,15 @@ export class EcosystemClient {
           const delay = this.config.retryDelayMs * Math.pow(2, attempt);
           await new Promise((resolve) => setTimeout(resolve, delay));
         }
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
 
     throw new NetworkError(
       lastError?.message ?? 'Request failed after retries',
       this.config.baseUrl,
-      createTrace().traceId,
+      tracing.traceId,
     );
   }
 }
