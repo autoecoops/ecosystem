@@ -12,7 +12,31 @@ router.post('/nodes/register', (req: Request, res: Response): void => {
     res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'nodeId and hostname are required' } });
     return;
   }
+
+  // Validate required nested fields for drift checking
+  if (!baseline.securityBaseline || typeof baseline.securityBaseline !== 'object') {
+    res.status(400).json({ success: false, error: { code: 'INVALID_BASELINE', message: 'securityBaseline object is required' } });
+    return;
+  }
+
+  if (!Array.isArray(baseline.services)) {
+    res.status(400).json({ success: false, error: { code: 'INVALID_BASELINE', message: 'services array is required' } });
+    return;
+  }
+
   registerNode(baseline);
+  
+  // Normalize baseline structure with defaults for drift-check
+  const normalizedBaseline = {
+    ...baseline,
+    securityBaseline: baseline.securityBaseline ?? {},
+    services: baseline.services ?? [],
+    packages: baseline.packages ?? [],
+    kernelVersion: baseline.kernelVersion ?? '',
+    osVersion: baseline.osVersion ?? '',
+  };
+  
+  registerNode(normalizedBaseline);
   res.status(201).json({ success: true, data: { nodeId: baseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
@@ -37,7 +61,33 @@ router.post('/agents/register', (req: Request, res: Response): void => {
     res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'agentId and nodeId are required' } });
     return;
   }
-  registerAgent(agent);
+
+  // Validate lastHeartbeat if provided
+  if (agent.lastHeartbeat) {
+    const heartbeatDate = new Date(agent.lastHeartbeat);
+    if (isNaN(heartbeatDate.getTime())) {
+      res.status(400).json({ success: false, error: { code: 'INVALID_DATE', message: 'lastHeartbeat must be a valid ISO 8601 date' } });
+      return;
+    }
+  }
+
+  // Validate status if provided
+  if (agent.status && !['online', 'offline', 'degraded'].includes(agent.status)) {
+    res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: 'status must be one of: online, offline, degraded' } });
+    return;
+  }
+
+  // Create normalized agent with defaults instead of mutating req.body
+  const normalizedAgent = {
+    ...agent,
+    lastHeartbeat: agent.lastHeartbeat ?? new Date().toISOString(),
+    status: agent.status ?? 'online',
+    version: agent.version ?? 'unknown',
+    capabilities: agent.capabilities ?? [],
+    metadata: agent.metadata ?? {},
+  };
+  
+  registerAgent(normalizedAgent);
   res.status(201).json({ success: true, data: { agentId: agent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 

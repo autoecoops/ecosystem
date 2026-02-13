@@ -16,6 +16,7 @@ app.use(cors({
   origin: allowedOrigins?.split(',') ?? '*',
   credentials: Boolean(allowedOrigins),
 }));
+app.use(cors({ origin: allowedOrigins, credentials: allowedOrigins !== '*' }));
 app.use(express.json({ limit: '1mb' }));
 app.use(compression());
 app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url === '/health' } }));
@@ -28,6 +29,7 @@ app.use('/infra', infraRoutes);
 
 app.use((_req, res) => { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Resource not found' } }); });
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  void _next;
   logger.error({ err }, 'Unhandled error');
   res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal server error' } });
 });

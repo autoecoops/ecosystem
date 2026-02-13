@@ -67,6 +67,7 @@ app.use((_req, res) => {
 
 // Global error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  void _next;
   logger.error({ err }, 'Unhandled error');
   res.status(500).json({
     success: false,
