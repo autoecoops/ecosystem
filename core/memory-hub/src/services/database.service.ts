@@ -28,8 +28,9 @@ export async function initDatabase(): Promise<void> {
 
   const client = await pool.connect();
   try {
-    // Enable pgvector extension
+    // Enable required extensions
     await client.query('CREATE EXTENSION IF NOT EXISTS vector');
+    await client.query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
 
     // Create documents table
     await client.query(`

@@ -12,8 +12,23 @@ router.post('/nodes/register', (req: Request, res: Response): void => {
     res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'nodeId and hostname are required' } });
     return;
   }
-  registerNode(baseline);
-  res.status(201).json({ success: true, data: { nodeId: baseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
+
+  // Validate baseline structure with defaults
+  const validatedBaseline = {
+    ...baseline,
+    securityBaseline: baseline.securityBaseline || {
+      firewallEnabled: false,
+      selinuxMode: 'unknown',
+      sshPasswordAuth: true,
+      auditdEnabled: false,
+      unattendedUpgrades: false,
+    },
+    services: baseline.services || [],
+    packages: baseline.packages || [],
+  };
+
+  registerNode(validatedBaseline);
+  res.status(201).json({ success: true, data: { nodeId: validatedBaseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
 // GET /platform/nodes/inventory - Get hardware inventory
@@ -37,8 +52,18 @@ router.post('/agents/register', (req: Request, res: Response): void => {
     res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'agentId and nodeId are required' } });
     return;
   }
-  registerAgent(agent);
-  res.status(201).json({ success: true, data: { agentId: agent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
+
+  // Validate and set server-side defaults
+  const validatedAgent = {
+    ...agent,
+    lastHeartbeat: new Date().toISOString(),
+    status: agent.status || 'online',
+    capabilities: agent.capabilities || [],
+    metadata: agent.metadata || {},
+  };
+
+  registerAgent(validatedAgent);
+  res.status(201).json({ success: true, data: { agentId: validatedAgent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
 // POST /platform/agents/:agentId/heartbeat - Agent heartbeat

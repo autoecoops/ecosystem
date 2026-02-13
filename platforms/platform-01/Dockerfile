@@ -2,7 +2,7 @@ FROM node:22-alpine AS builder
 RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
 WORKDIR /app
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm install --prod=false
 COPY tsconfig.json ./
 COPY src/ ./src/
 RUN pnpm run build
