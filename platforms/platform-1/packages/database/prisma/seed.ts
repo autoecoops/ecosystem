@@ -60,7 +60,6 @@ async function main() {
       originalFileName: 'sample.pdf',
       fileSize: 245678,
       mimeType: 'application/pdf',
-      s3Key: `contracts/${demoUser.id}/sample-${Date.now()}.pdf`,
       s3Key: `contracts/${demoUser.id}/${randomUUID()}.pdf`,
       status: 'COMPLETED'
     }

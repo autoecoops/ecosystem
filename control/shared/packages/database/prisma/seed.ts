@@ -37,7 +37,7 @@ async function main() {
     }
   });
 
-  const adminUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email: 'admin@contracts-l1.com',
       name: 'Admin User',
