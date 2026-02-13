@@ -1,11 +1,12 @@
 import { CodeEditor } from '@/components/editor/code-editor';
 
 interface EditorPageProps {
-  params: {
+  params: Promise<{
     projectId: string;
-  };
+  }>;
 }
 
-export default function EditorPage({ params }: EditorPageProps) {
-  return <CodeEditor projectId={params.projectId} />;
+export default async function EditorPage({ params }: EditorPageProps) {
+  const { projectId } = await params;
+  return <CodeEditor projectId={projectId} />;
 }
