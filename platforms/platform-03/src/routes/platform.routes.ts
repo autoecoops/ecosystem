@@ -28,18 +28,6 @@ router.post('/nodes/register', (req: Request, res: Response): void => {
   
   registerNode(validatedBaseline);
   res.status(201).json({ success: true, data: { nodeId: validatedBaseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
-  // Normalize baseline structure with defaults for drift-check
-  const normalizedBaseline = {
-    ...baseline,
-    securityBaseline: baseline.securityBaseline ?? {},
-    services: baseline.services ?? [],
-    packages: baseline.packages ?? [],
-    kernelVersion: baseline.kernelVersion ?? '',
-    osVersion: baseline.osVersion ?? '',
-  };
-  
-  registerNode(normalizedBaseline);
-  res.status(201).json({ success: true, data: { nodeId: baseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
 // GET /platform/nodes/inventory - Get hardware inventory
@@ -81,17 +69,6 @@ router.post('/agents/register', (req: Request, res: Response): void => {
   
   registerAgent(validatedAgent);
   res.status(201).json({ success: true, data: { agentId: validatedAgent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
-  // Normalize agent structure with required fields for heartbeat monitor
-  const normalizedAgent = {
-    ...agent,
-    lastHeartbeat: agent.lastHeartbeat ?? new Date().toISOString(),
-    status: agent.status ?? 'online',
-    version: agent.version ?? 'unknown',
-    capabilities: agent.capabilities ?? [],
-  };
-  
-  registerAgent(normalizedAgent);
-  res.status(201).json({ success: true, data: { agentId: agent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
 // POST /platform/agents/:agentId/heartbeat - Agent heartbeat
