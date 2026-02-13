@@ -20,12 +20,15 @@ router.post('/nodes/register', (req: Request, res: Response): void => {
     return;
   }
   
-  // Ensure arrays exist with defaults
-  baseline.services = baseline.services || [];
-  baseline.packages = baseline.packages || [];
+  // Create validated object with defaults instead of mutating input
+  const validatedBaseline = {
+    ...baseline,
+    services: baseline.services || [],
+    packages: baseline.packages || [],
+  };
   
-  registerNode(baseline);
-  res.status(201).json({ success: true, data: { nodeId: baseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
+  registerNode(validatedBaseline);
+  res.status(201).json({ success: true, data: { nodeId: validatedBaseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
 // GET /platform/nodes/inventory - Get hardware inventory
@@ -50,19 +53,23 @@ router.post('/agents/register', (req: Request, res: Response): void => {
     return;
   }
   
-  // Set server-side defaults for heartbeat monitoring
-  agent.lastHeartbeat = agent.lastHeartbeat || new Date().toISOString();
-  agent.status = agent.status || 'online';
-  
   // Validate status value
   const validStatuses = ['online', 'offline', 'degraded'] as const;
-  if (!validStatuses.includes(agent.status)) {
+  const status = agent.status || 'online';
+  if (!validStatuses.includes(status as typeof validStatuses[number])) {
     res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: 'status must be one of: online, offline, degraded' } });
     return;
   }
   
-  registerAgent(agent);
-  res.status(201).json({ success: true, data: { agentId: agent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
+  // Create validated object with server-side defaults
+  const validatedAgent = {
+    ...agent,
+    lastHeartbeat: agent.lastHeartbeat || new Date().toISOString(),
+    status,
+  };
+  
+  registerAgent(validatedAgent);
+  res.status(201).json({ success: true, data: { agentId: validatedAgent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
 // POST /platform/agents/:agentId/heartbeat - Agent heartbeat
