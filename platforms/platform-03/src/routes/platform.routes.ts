@@ -13,7 +13,18 @@ router.post('/nodes/register', (req: Request, res: Response): void => {
     res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'nodeId and hostname are required' } });
     return;
   }
-  registerNode(baseline);
+  
+  // Normalize baseline structure with defaults for drift-check
+  const normalizedBaseline = {
+    ...baseline,
+    securityBaseline: baseline.securityBaseline ?? {},
+    services: baseline.services ?? [],
+    packages: baseline.packages ?? [],
+    kernelVersion: baseline.kernelVersion ?? '',
+    osVersion: baseline.osVersion ?? '',
+  };
+  
+  registerNode(normalizedBaseline);
   res.status(201).json({ success: true, data: { nodeId: baseline.nodeId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 
@@ -38,7 +49,17 @@ router.post('/agents/register', (req: Request, res: Response): void => {
     res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'agentId and nodeId are required' } });
     return;
   }
-  registerAgent(agent);
+  
+  // Normalize agent structure with required fields for heartbeat monitor
+  const normalizedAgent = {
+    ...agent,
+    lastHeartbeat: agent.lastHeartbeat ?? new Date().toISOString(),
+    status: agent.status ?? 'online',
+    version: agent.version ?? 'unknown',
+    capabilities: agent.capabilities ?? [],
+  };
+  
+  registerAgent(normalizedAgent);
   res.status(201).json({ success: true, data: { agentId: agent.agentId }, meta: { requestId: uuidv4(), timestamp: new Date().toISOString() } });
 });
 

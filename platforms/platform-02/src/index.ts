@@ -9,8 +9,9 @@ import platformRoutes from './routes/platform.routes';
 
 const app = express();
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') ?? '*';
 app.use(helmet());
-app.use(cors({ origin: process.env.ALLOWED_ORIGINS?.split(',') ?? '*', credentials: true }));
+app.use(cors({ origin: allowedOrigins, credentials: allowedOrigins !== '*' && Boolean(process.env.ALLOWED_ORIGINS) }));
 app.use(express.json({ limit: '10mb' }));
 app.use(compression());
 app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url === '/health' } }));

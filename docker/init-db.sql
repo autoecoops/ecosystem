@@ -17,6 +17,7 @@ GRANT ALL PRIVILEGES ON DATABASE policy_audit TO postgres;
 \c memory_hub
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- Enable extensions in policy_audit
 \c policy_audit
