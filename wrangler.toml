@@ -1,11 +1,17 @@
-# Cloudflare Pages Configuration for Next.js
-# This file is used for local development with wrangler pages dev
-# For production deployment, configure in Cloudflare Dashboard or use GitHub Actions
+# ⚠️ WARNING: This configuration is NOT suitable for the current Next.js app
+# 
+# This app has API routes (app/api/*) that require server runtime.
+# Cloudflare Pages static export does NOT support API routes.
+#
+# Recommended deployment options:
+# 1. Vercel (recommended) - Full Next.js support including API routes
+# 2. Cloudflare Workers with @cloudflare/next-on-pages - Requires additional setup
+#
+# See docs/DEPLOYMENT_FAILURE_ANALYSIS.md for detailed explanation
 
 name = "autoecoops-ecosystem"
-compatibility_date = "2024-12-01"
-pages_build_output_dir = "./frontend/project-01/out"
+compatibility_date = "2026-01-01"
 
-# For Cloudflare Pages deployment
-# The build command should be: cd frontend/project-01 && pnpm install && pnpm run build
-# The output directory should be: frontend/project-01/out
+# This configuration is kept for reference but should not be used
+# for the current app which has API routes
+# pages_build_output_dir = "./frontend/project-01/out"
