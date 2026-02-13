@@ -19,7 +19,7 @@
 
 ```toml
 name = "autoecoops-ecosystem"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-01"
 pages_build_output_dir = "./frontend/project-01/out"
 ```
 

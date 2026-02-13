@@ -44,7 +44,6 @@ pnpm-debug.log*
 .git/
 .github/
 LICENSE
-*.md
-# Keep documentation that might be needed at runtime
+# Keep important documentation
 !README.md
-!docs/*.md
+!docs/
