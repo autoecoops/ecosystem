@@ -62,11 +62,8 @@ router.post('/agents/register', (req: Request, res: Response): void => {
     return;
   }
 
-  // Validate and set defaults for heartbeat monitoring
-  if (!agent.lastHeartbeat) {
-    agent.lastHeartbeat = new Date().toISOString();
-  } else {
-    // Validate lastHeartbeat is a valid ISO date
+  // Validate lastHeartbeat if provided
+  if (agent.lastHeartbeat) {
     const heartbeatDate = new Date(agent.lastHeartbeat);
     if (isNaN(heartbeatDate.getTime())) {
       res.status(400).json({ success: false, error: { code: 'INVALID_DATE', message: 'lastHeartbeat must be a valid ISO 8601 date' } });
@@ -74,22 +71,20 @@ router.post('/agents/register', (req: Request, res: Response): void => {
     }
   }
 
-  if (!agent.status) {
-    agent.status = 'online';
-  } else if (!['online', 'offline', 'degraded'].includes(agent.status)) {
+  // Validate status if provided
+  if (agent.status && !['online', 'offline', 'degraded'].includes(agent.status)) {
     res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: 'status must be one of: online, offline, degraded' } });
     return;
   }
 
-  registerAgent(agent);
-  
-  // Normalize agent structure with required fields for heartbeat monitor
+  // Create normalized agent with defaults instead of mutating req.body
   const normalizedAgent = {
     ...agent,
     lastHeartbeat: agent.lastHeartbeat ?? new Date().toISOString(),
     status: agent.status ?? 'online',
     version: agent.version ?? 'unknown',
     capabilities: agent.capabilities ?? [],
+    metadata: agent.metadata ?? {},
   };
   
   registerAgent(normalizedAgent);
