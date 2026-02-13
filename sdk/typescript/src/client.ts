@@ -103,8 +103,8 @@ export class EcosystemClient {
         const contentType = response.headers.get('content-type');
         const contentLength = response.headers.get('content-length');
         
-        // Return undefined for empty bodies
-        if (contentLength === '0' || (!contentType?.includes('application/json') && !contentType?.includes('json'))) {
+        // Return undefined for empty bodies or non-JSON responses
+        if (contentLength === '0' || !contentType?.includes('json')) {
           return undefined as T;
         }
 
