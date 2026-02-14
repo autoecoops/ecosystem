@@ -25,7 +25,7 @@ export function LandingPage() {
           <div className="flex items-center space-x-2">
             <Code className="h-8 w-8 text-blue-500" />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-              autoecoops
+              machops
             </span>
           </div>
           <div className="flex items-center space-x-4">
@@ -112,7 +112,7 @@ export function LandingPage() {
             Ready to Transform Your Development?
           </h2>
           <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of developers who are already coding smarter with autoecoops.
+            Join thousands of developers who are already coding smarter with machops.
           </p>
           <Link href="/login">
             <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-50">
@@ -125,7 +125,7 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-border/40 py-12">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 autoecoops. Built with Next.js, Supabase, and Groq AI.</p>
+          <p>&copy; 2024 machops. Built with Next.js, Supabase, and Groq AI.</p>
         </div>
       </footer>
     </div>

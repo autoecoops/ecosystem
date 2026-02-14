@@ -78,7 +78,7 @@ export function Dashboard() {
             <div className="flex items-center space-x-2">
               <Code className="h-8 w-8 text-blue-500" />
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                autoecoops
+                machops
               </span>
             </div>
           </div>

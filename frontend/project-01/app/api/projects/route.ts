@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
           ...validatedData,
           user_id: user.id,
           files: {
-            'main.js': '// Welcome to autoecoops!\nconsole.log("Hello, World!");'
+            'main.js': '// Welcome to machops!\nconsole.log("Hello, World!");'
           }
         }
       ])

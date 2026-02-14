@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { message, context, type } = chatRequestSchema.parse(body);
 
-    let systemPrompt = `You are an expert programming assistant integrated into autoecoops, an AI-powered code platform. 
+    let systemPrompt = `You are an expert programming assistant integrated into machops, an AI-powered code platform. 
 You help developers with coding questions, explanations, refactoring, debugging, and code completion.
 Always provide clear, concise, and actionable responses.`;
 

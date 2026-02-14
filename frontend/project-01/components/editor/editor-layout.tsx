@@ -44,7 +44,7 @@ export function EditorLayout() {
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground">
                     <div className="text-center">
-                      <h3 className="text-lg font-semibold mb-2">Welcome to autoecoops</h3>
+                      <h3 className="text-lg font-semibold mb-2">Welcome to machops</h3>
                       <p>Select a file from the explorer to start coding</p>
                     </div>
                   </div>

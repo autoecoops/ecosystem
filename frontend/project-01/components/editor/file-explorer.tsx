@@ -194,15 +194,15 @@ function getLanguageFromExtension(extension: string): string {
 
 function getTemplateContent(language: string): string {
   const templates: Record<string, string> = {
-    javascript: '// Welcome to autoecoops!\nconsole.log("Hello, World!");',
-    typescript: '// Welcome to autoecoops!\nconsole.log("Hello, World!");',
-    python: '# Welcome to autoecoops!\nprint("Hello, World!")',
+    javascript: '// Welcome to machops!\nconsole.log("Hello, World!");',
+    typescript: '// Welcome to machops!\nconsole.log("Hello, World!");',
+    python: '# Welcome to machops!\nprint("Hello, World!")',
     go: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}',
     rust: 'fn main() {\n    println!("Hello, World!");\n}',
     java: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}',
     html: '<!DOCTYPE html>\n<html>\n<head>\n    <title>Hello World</title>\n</head>\n<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>',
-    css: '/* Welcome to autoecoops! */\nbody {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}',
+    css: '/* Welcome to machops! */\nbody {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}',
   };
 
-  return templates[language] || '// Welcome to autoecoops!\n';
+  return templates[language] || '// Welcome to machops!\n';
 }

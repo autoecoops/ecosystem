@@ -15,7 +15,7 @@ jobs:
       - name: 檢查提交作者與提交者信箱
         run: |
           # 允許的網域列表
-          ALLOWED_DOMAINS=("@autoecoops\.io$" "@users\.noreply\.github\.com$")
+          ALLOWED_DOMAINS=("@machops\.io$" "@users\.noreply\.github\.com$")
           EXIT_CODE=0
 
           # 取得此 PR 的所有提交 SHA

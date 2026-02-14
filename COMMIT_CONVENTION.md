@@ -30,7 +30,7 @@
 
 為了確保提交來源的合規性，所有提交的作者 (Author) 與提交者 (Committer) 信箱必須屬於以下網域：
 
-- `@autoecoops.io` (官方網域)
+- `@machops.io` (官方網域)
 - `@users.noreply.github.com` (GitHub 隱私信箱)
 
 ### 如何設定您的 Git 信箱
@@ -38,11 +38,11 @@
 
 ```bash
 # 設定全域信箱
-git config --global user.email "your-name@autoecoops.io"
+git config --global user.email "your-name@machops.io"
 git config --global user.name "Your Name"
 
 # 或僅針對此倉庫設定
-git config user.email "your-name@autoecoops.io"
+git config user.email "your-name@machops.io"
 git config user.name "Your Name"
 ```
 
@@ -66,7 +66,7 @@ git config user.name "Your Name"
 若您使用 AI 代理（如 Aider, OpenHands 等）進行開發，請務必在代理的環境變數或啟動指令中配置正確的信箱：
 
 ```bash
-git config user.email "evolution@autoecoops.io"
+git config user.email "evolution@machops.io"
 git config user.name "AutoEcoOps Bot"
 ```
 

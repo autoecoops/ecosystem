@@ -16,7 +16,7 @@ export function Terminal() {
   const [lines, setLines] = useState<TerminalLine[]>([
     {
       id: '1',
-      content: 'Welcome to autoecoops Terminal',
+      content: 'Welcome to machops Terminal',
       type: 'output',
       timestamp: new Date(),
     },

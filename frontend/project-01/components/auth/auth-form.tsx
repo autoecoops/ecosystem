@@ -71,7 +71,7 @@ export function AuthForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Welcome to autoecoops</CardTitle>
+        <CardTitle>Welcome to machops</CardTitle>
         <CardDescription>
           Sign in to your account or create a new one to get started.
         </CardDescription>

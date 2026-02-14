@@ -8,7 +8,7 @@ import { Toaster } from 'sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'autoecoops - AI-Powered Code Platform',
+  title: 'machops - AI-Powered Code Platform',
   description: 'Cloud-based code editor with AI assistance, real-time collaboration, and multi-language execution.',
 };
 
