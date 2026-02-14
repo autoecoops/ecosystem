@@ -2,9 +2,12 @@ name = "autoecoops-ecosystem"
 compatibility_date = "2025-12-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Cloudflare Pages build output directory (required for Pages)
+pages_build_output_dir = "frontend/project-01/.open-next/assets"
+
 # Cloudflare Pages build configuration
 [build]
-command = "cd frontend/project-01 && npm install && npm run build:cf"
+command = "cd frontend/project-01 && pnpm install && pnpm build:cf"
 cwd = "."
 watch_paths = ["frontend/project-01/**/*.{ts,tsx,js,jsx,json,css}"]
 

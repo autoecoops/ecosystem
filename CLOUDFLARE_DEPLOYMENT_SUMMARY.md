@@ -1,5 +1,21 @@
 # Cloudflare Pages 部署成功總結
 
+## ⚠️ 重要：最新更新 (2026-02-14)
+
+### 🔧 已修復部署失敗問題
+
+**問題 1: wrangler.toml 配置錯誤**
+- ✅ 已在根目錄 wrangler.toml 添加 `pages_build_output_dir = "frontend/project-01/.open-next/assets"`
+- ✅ 這修復了 "wrangler.toml file was found but it does not appear to be valid" 錯誤
+
+**問題 2: Cloudflare Pages 儀表板配置錯誤**
+- ❌ 你目前使用的構建命令是錯誤的：`npx @cloudflare/next-on-pages@1`
+- ❌ 輸出目錄也是錯誤的：`.vercel/output/static`
+- ✅ 請參考下方的正確配置更新
+
+**問題 3: pnpm lockfile 不同步**
+- ✅ lockfile 已更新（如果有需要）
+
 ## ⚠️ 重要安全更新
 
 **已修復 27 個 Next.js 安全漏洞！**
@@ -46,23 +62,45 @@
 
 #### 構建設置
 
-| 設定 | 值 |
-|-----|-----|
-| 框架預設 | Next.js |
-| 構建命令 | `cd frontend/project-01 && pnpm install && pnpm build:cf` |
-| 構建輸出目錄 | `.open-next/assets` |
-| 根目錄 | `/` (留空或設為倉庫根目錄) |
-| Node.js 版本 | 18 或 20 (推薦 18) |
+**⚠️ 重要：請在 Cloudflare Pages 儀表板中將以下設置完全更改為正確的值！**
+
+| 設定 | 正確的值 | 你當前的錯誤值 |
+|-----|---------|--------------|
+| 框架預設 | Next.js | (保持不變) |
+| 構建命令 | `cd frontend/project-01 && pnpm install && pnpm build:cf` | ❌ `npx @cloudflare/next-on-pages@1` |
+| 構建輸出目錄 | `.open-next/assets` | ❌ `.vercel/output/static` |
+| 根目錄 (Root directory) | `/` 或留空 | ❌ `frontend/project-01` |
+| Node.js 版本 | 18 或 20 (推薦 18) | (檢查確認) |
+
+#### ⚠️ 關鍵配置說明
+
+**1. 根目錄 (Root Directory):**
+- **必須設為** `/` （留空）或倉庫根目錄
+- **不能設為** `frontend/project-01` 
+- ❌ 你當前設置的 `frontend/project-01` 是錯誤的！
+- 原因：構建命令已經包含 `cd frontend/project-01`，所以根目錄應該是倉庫根
+
+**2. 構建命令:**
+- **必須使用** `cd frontend/project-01 && pnpm install && pnpm build:cf`
+- **不能使用** `npx @cloudflare/next-on-pages@1`
+- 原因：這個項目使用 `@opennextjs/cloudflare` 適配器，不是 `@cloudflare/next-on-pages`
+
+**3. 輸出目錄:**
+- **必須使用** `.open-next/assets`
+- **不能使用** `.vercel/output/static`
+- 原因：OpenNext Cloudflare 的輸出在 `.open-next/assets`，不是 Vercel 的目錄
 
 #### ⚠️ 重要提示
 
 **不要使用以下錯誤的設置：**
 - ❌ 構建命令: `npx @cloudflare/next-on-pages@1`
 - ❌ 輸出目錄: `.vercel/output/static`
+- ❌ 根目錄: `frontend/project-01`
 
 **要使用正確的設置：**
 - ✅ 構建命令: `cd frontend/project-01 && pnpm install && pnpm build:cf`
 - ✅ 輸出目錄: `.open-next/assets`
+- ✅ 根目錄: `/` (留空)
 
 #### 環境變數
 
