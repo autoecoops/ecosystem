@@ -1,11 +1,13 @@
 import { CodeEditor } from '@/components/editor/code-editor';
+import { use } from 'react';
 
 interface EditorPageProps {
-  params: {
+  params: Promise<{
     projectId: string;
-  };
+  }>;
 }
 
 export default function EditorPage({ params }: EditorPageProps) {
-  return <CodeEditor projectId={params.projectId} />;
+  const { projectId } = use(params);
+  return <CodeEditor projectId={projectId} />;
 }
