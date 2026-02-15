@@ -28,12 +28,6 @@ export function CodeEditor({ projectId }: CodeEditorProps) {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    if (user && projectId) {
-      fetchProject();
-    }
-  }, [user, projectId, fetchProject]);
-
   const fetchProject = useCallback(async () => {
     setProjectLoading(true);
     try {
@@ -61,6 +55,12 @@ export function CodeEditor({ projectId }: CodeEditorProps) {
       setInitLoading(false);
     }
   }, [projectId, router, setCurrentProject, setProjectLoading]);
+
+  useEffect(() => {
+    if (user && projectId) {
+      fetchProject();
+    }
+  }, [user, projectId, fetchProject]);
 
   if (loading || initLoading) {
     return (

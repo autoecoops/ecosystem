@@ -5,6 +5,12 @@ import { z } from 'zod';
 const DEFAULT_MAIN_JS_CONTENT =
   '// Welcome to machops!\nconsole.log("Hello, World!");';
 
+const DEFAULT_MAIN_TS_CONTENT =
+  '// Welcome to machops!\nconsole.log("Hello, World!");';
+
+const DEFAULT_MAIN_PY_CONTENT =
+  '# Welcome to machops!\nprint("Hello, World!")';
+
 const createProjectSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
@@ -24,6 +30,22 @@ function getDefaultFileName(language: string | undefined): string {
       return 'main.py';
     default:
       return 'main.js';
+  }
+}
+
+function getDefaultFileContent(language: string | undefined): string {
+  switch (language?.toLowerCase()) {
+    case 'javascript':
+    case 'js':
+      return DEFAULT_MAIN_JS_CONTENT;
+    case 'typescript':
+    case 'ts':
+      return DEFAULT_MAIN_TS_CONTENT;
+    case 'python':
+    case 'py':
+      return DEFAULT_MAIN_PY_CONTENT;
+    default:
+      return DEFAULT_MAIN_JS_CONTENT;
   }
 }
 
@@ -76,6 +98,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createProjectSchema.parse(body);
     const defaultFileName = getDefaultFileName(validatedData.language);
+    const defaultFileContent = getDefaultFileContent(validatedData.language);
 
     const { data: project, error } = await supabase
       .from('projects')
@@ -84,7 +107,7 @@ export async function POST(request: NextRequest) {
           ...validatedData,
           user_id: user.id,
           files: {
-            [defaultFileName]: DEFAULT_MAIN_JS_CONTENT
+            [defaultFileName]: defaultFileContent
           }
         }
       ])
