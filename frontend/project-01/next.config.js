@@ -14,3 +14,5 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+// This comment is added to trigger a new Cloudflare Pages build.
