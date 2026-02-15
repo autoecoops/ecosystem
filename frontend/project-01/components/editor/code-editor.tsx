@@ -37,7 +37,8 @@ export function CodeEditor({ projectId }: CodeEditorProps) {
         try {
           project = await response.json();
         } catch (parseError) {
-          toast.error('Failed to load project data');
+          console.error('Failed to parse project data:', parseError);
+          toast.error('Invalid project data received');
           return;
         }
         setCurrentProject(project);
