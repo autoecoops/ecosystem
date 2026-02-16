@@ -2,11 +2,52 @@ import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+const DEFAULT_MAIN_JS_CONTENT =
+  '// Welcome to machops!\nconsole.log("Hello, World!");';
+
+const DEFAULT_MAIN_TS_CONTENT =
+  '// Welcome to machops!\nconsole.log("Hello, World!");';
+
+const DEFAULT_MAIN_PY_CONTENT =
+  '# Welcome to machops!\nprint("Hello, World!")';
+
 const createProjectSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   language: z.string(),
 });
+
+function getDefaultFileName(language: string | undefined): string {
+  switch (language?.toLowerCase()) {
+    case 'javascript':
+    case 'js':
+      return 'main.js';
+    case 'typescript':
+    case 'ts':
+      return 'main.ts';
+    case 'python':
+    case 'py':
+      return 'main.py';
+    default:
+      return 'main.js';
+  }
+}
+
+function getDefaultFileContent(language: string | undefined): string {
+  switch (language?.toLowerCase()) {
+    case 'javascript':
+    case 'js':
+      return DEFAULT_MAIN_JS_CONTENT;
+    case 'typescript':
+    case 'ts':
+      return DEFAULT_MAIN_TS_CONTENT;
+    case 'python':
+    case 'py':
+      return DEFAULT_MAIN_PY_CONTENT;
+    default:
+      return DEFAULT_MAIN_JS_CONTENT;
+  }
+}
 
 export async function GET() {
   try {
@@ -29,7 +70,15 @@ export async function GET() {
 
     return NextResponse.json(projects);
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    if (error instanceof Error) {
+      console.error('Error fetching projects:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+    } else {
+      console.error('Error fetching projects:', String(error));
+    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -48,6 +97,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const validatedData = createProjectSchema.parse(body);
+    const defaultFileName = getDefaultFileName(validatedData.language);
+    const defaultFileContent = getDefaultFileContent(validatedData.language);
 
     const { data: project, error } = await supabase
       .from('projects')
@@ -56,7 +107,7 @@ export async function POST(request: NextRequest) {
           ...validatedData,
           user_id: user.id,
           files: {
-            'main.js': '// Welcome to machops!\nconsole.log("Hello, World!");'
+            [defaultFileName]: defaultFileContent
           }
         }
       ])
@@ -76,6 +127,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.error('Error creating project:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

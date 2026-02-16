@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/providers/auth-provider';
 import { useRouter } from 'next/navigation';
 import { useProjectStore } from '@/lib/stores/project-store';
@@ -28,18 +28,19 @@ export function CodeEditor({ projectId }: CodeEditorProps) {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    if (user && projectId) {
-      fetchProject();
-    }
-  }, [user, projectId]);
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     setProjectLoading(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${encodeURIComponent(projectId)}`);
       if (response.ok) {
-        const project = await response.json();
+        let project;
+        try {
+          project = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse project data:', parseError);
+          toast.error('Invalid project data received');
+          return;
+        }
         setCurrentProject(project);
       } else if (response.status === 404) {
         toast.error('Project not found');
@@ -48,12 +49,19 @@ export function CodeEditor({ projectId }: CodeEditorProps) {
         toast.error('Failed to load project');
       }
     } catch (error) {
-      toast.error('Failed to load project');
+      console.error('Failed to load project:', error);
+      toast.error('Failed to load project. Please try again.');
     } finally {
       setProjectLoading(false);
       setInitLoading(false);
     }
-  };
+  }, [projectId, router, setCurrentProject, setProjectLoading]);
+
+  useEffect(() => {
+    if (user && projectId) {
+      fetchProject();
+    }
+  }, [user, projectId, fetchProject]);
 
   if (loading || initLoading) {
     return (

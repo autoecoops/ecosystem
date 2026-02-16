@@ -8,17 +8,10 @@ export const createClient = async () => {
 
   // Defensive check for build-time or missing env vars
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase environment variables are missing. Returning a dummy client for build-time safety.');
-    // Return a proxy or a dummy client that won't crash the build
-    return createServerClient<Database>(
-      'https://placeholder.supabase.co',
-      'placeholder-key',
-      {
-        cookies: {
-          get() { return undefined; },
-        },
-      }
-    );
+    const message =
+      'Supabase environment variables NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_ANON_KEY are missing.';
+    console.error(message);
+    throw new Error(message);
   }
 
   const cookieStore = await cookies();
