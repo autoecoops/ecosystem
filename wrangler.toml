@@ -1,8 +1,0 @@
-[pages]
-framework = "next"
-
-[pages.build_output]
-path = "frontend/project-01/.open-next"
-
-[pages.project_root]
-path = "frontend/project-01"
