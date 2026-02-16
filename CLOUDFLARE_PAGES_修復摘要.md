@@ -45,18 +45,11 @@
 | 設定項目 | 設定值 |
 |---------|--------|
 | **Framework preset** | `Next.js (Static HTML Export)` 或 `None` |
-| **Build command** | `pnpm run build:cf --filter=./frontend/project-01...` |
+| **Build command** | `pnpm --filter="./frontend/project-01..." run build:cf` |
 | **Build output directory** | `frontend/project-01/.open-next` (注意：是 `.open-next` 不是 `.open-next/assets`) |
 | **Root directory** | `/` (保持根目錄，不要改成 frontend/project-01) |
 
-> **重要：** 此專案使用 pnpm monorepo 結構，請務必使用上面的 `--filter` 指令。
-
-### 備選的 Build command（僅適用於非 monorepo 設定）
-⚠️ **警告：** 在 pnpm monorepo/workspace 環境下，以下指令**不會正常運作**：
-```bash
-cd frontend/project-01 && pnpm run build:cf
-```
-此指令會讓 pnpm 忽略 workspace 根目錄，導致依賴解析失敗。
+> **重要：** 此專案使用 pnpm monorepo 結構，請務必使用正確的 `--filter` 語法。使用 `cd` 指令（例如 `cd frontend/project-01 && pnpm run build:cf`）會導致 pnpm 忽略 workspace 根目錄，造成依賴解析失敗。
 
 ---
 

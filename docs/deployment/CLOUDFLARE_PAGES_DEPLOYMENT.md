@@ -1,5 +1,11 @@
 # Cloudflare Pages Deployment Guide
 
+> **⚠️ DEPRECATED:** This documentation is outdated. The root `wrangler.toml` file referenced in this guide has been removed.
+> 
+> **Please refer to:** [`CLOUDFLARE_PAGES_SETUP.md`](../../CLOUDFLARE_PAGES_SETUP.md) in the repository root for current deployment instructions.
+
+---
+
 ## Overview
 
 This guide explains how to deploy the frontend application (`frontend/project-01`) to Cloudflare Pages using the OpenNext Cloudflare adapter.
@@ -9,6 +15,8 @@ This guide explains how to deploy the frontend application (`frontend/project-01
 The build configuration is managed in two places:
 
 ### 1. Repository Configuration (`wrangler.toml`)
+
+> **⚠️ NOTE:** The root `wrangler.toml` file has been removed. This section is kept for historical reference only.
 
 Located at the repository root, this file contains the build settings used by Cloudflare Pages:
 
