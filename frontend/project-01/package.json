@@ -75,7 +75,7 @@
     "typescript": "^5.7.3",
     "vaul": "^1.1.2",
     "zod": "^3.24.0",
-    "zustand": "^4.4.7"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@opennextjs/cloudflare": "^1.0.0",
