@@ -23,7 +23,7 @@ The `build:cf` command has been updated to:
 
 The root `wrangler.toml` file has been removed to prevent Cloudflare Pages from showing warnings about a Wrangler configuration file in a Pages-only project. If you see references to `wrangler.toml` in older documentation (such as `docs/deployment/CLOUDFLARE_PAGES_DEPLOYMENT.md`) or commits, those are now obsolete and no longer required for this setup.
 
-**Note:** There is still a `frontend/project-01/wrangler.toml` file for local development with `wrangler pages dev`, but the root-level file that was causing warnings has been removed. The local `wrangler.toml` will be updated to match the production configuration (`pages_build_output_dir = ".open-next"` instead of `".open-next/assets"`) so that local testing behavior matches production deployment exactly.
+**Note:** There is still a `frontend/project-01/wrangler.toml` file for local development with `wrangler pages dev`, but the root-level file that was causing warnings has been removed. The local `wrangler.toml` has been updated in this PR to match the production configuration (`pages_build_output_dir = ".open-next"` instead of `".open-next/assets"`) so that local testing behavior matches production deployment exactly.
 
 ---
 
@@ -42,7 +42,7 @@ Go to your Cloudflare Pages project:
    pnpm --filter="./frontend/project-01..." run build:cf
    ```
    
-   > **Important:** This repository uses a pnpm monorepo with workspace configuration. Always use the `--filter` command above when building for Cloudflare Pages. `cd`-based commands (for example, running `cd frontend/project-01 && pnpm run build:cf`) can cause pnpm to ignore the workspace root and break dependency resolution in this setup.
+   > **Important:** This repository uses a pnpm monorepo with workspace configuration. Always use the `--filter` command above when building for Cloudflare Pages. The `...` suffix includes the package and all its workspace dependencies. `cd`-based commands (for example, running `cd frontend/project-01 && pnpm run build:cf`) can cause pnpm to ignore the workspace root and break dependency resolution in this setup.
 
 3. **Build output directory:**
    ```
