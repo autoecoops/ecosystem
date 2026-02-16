@@ -1,0 +1,215 @@
+name: Cloudflare Pages Simple Monitor
+
+on:
+  # 定期檢查（每小時）
+  schedule:
+    - cron: '0 * * * *'
+  
+  # 手動觸發
+  workflow_dispatch:
+    inputs:
+      check_deployment:
+        description: 'Check latest Cloudflare Pages deployment'
+        required: false
+        default: 'true'
+  
+  # PR 時檢查
+  pull_request:
+    paths:
+      - 'frontend/project-01/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  check-and-fix:
+    name: Check Cloudflare Pages Status
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PROJECT_NAME: autoecoops
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js and pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Check package.json configuration
+        id: check_config
+        run: |
+          echo "=== Checking package.json build:cf configuration ==="
+          
+          # 讀取 build:cf 命令
+          BUILD_CMD=$(node -p "require('./frontend/project-01/package.json').scripts['build:cf']")
+          
+          echo "Current build:cf command (first 200 chars):"
+          echo "$BUILD_CMD" | head -c 200
+          echo ""
+          
+          # 檢查關鍵組件
+          ISSUES=0
+          FIXES=""
+          
+          # 檢查 1: wrangler.toml 生成
+          if ! echo "$BUILD_CMD" | grep -q "wrangler.toml"; then
+            echo "❌ Missing wrangler.toml generation"
+            ISSUES=$((ISSUES + 1))
+            FIXES="$FIXES- Add wrangler.toml generation\n"
+          else
+            echo "✅ wrangler.toml generation present"
+          fi
+          
+          # 檢查 2: nodejs_compat 標志
+          if ! echo "$BUILD_CMD" | grep -q "nodejs_compat"; then
+            echo "❌ Missing nodejs_compat flag"
+            ISSUES=$((ISSUES + 1))
+            FIXES="$FIXES- Add nodejs_compat flag\n"
+          else
+            echo "✅ nodejs_compat flag present"
+          fi
+          
+          # 检查 3: _worker.js 重命名
+          if ! echo "$BUILD_CMD" | grep -q "_worker.js"; then
+            echo "❌ Missing _worker.js renaming"
+            ISSUES=$((ISSUES + 1))
+            FIXES="$FIXES- Add _worker.js renaming\n"
+          else
+            echo "✅ _worker.js renaming present"
+          fi
+          
+          # 检查 4: _routes.json 生成
+          if ! echo "$BUILD_CMD" | grep -q "_routes.json"; then
+            echo "❌ Missing _routes.json generation"
+            ISSUES=$((ISSUES + 1))
+            FIXES="$FIXES- Add _routes.json generation\n"
+          else
+            echo "✅ _routes.json generation present"
+          fi
+          
+          # 检查 5: 正確的 JSON 轉義
+          if echo "$BUILD_CMD" | grep -q "&quot;"; then
+            echo "❌ Found HTML entity encoding (&quot;)"
+            ISSUES=$((ISSUES + 1))
+            FIXES="$FIXES- Fix HTML entity encoding\n"
+          else
+            echo "✅ Correct JSON escape sequences"
+          fi
+          
+          echo ""
+          echo "Total issues: $ISSUES"
+          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+          echo "fixes=$FIXES" >> $GITHUB_OUTPUT
+
+      - name: Fix configuration
+        id: fix
+        if: steps.check_config.outputs.issues > 0
+        run: |
+          echo "=== Applying fixes ==="
+          
+          python3 << 'EOF'
+import json
+
+with open('frontend/project-01/package.json', 'r') as f:
+    data = json.load(f)
+
+# 完整且正確的構建命令
+data['scripts']['build:cf'] = """NEXT_PUBLIC_SUPABASE_URL=https://yrfxijooswpvdpdseswy.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_rhTyBa4IqqV14nV_B87S7g_zKzDSYTd npx @opennextjs/cloudflare@1.16.5 build && mv .open-next/worker.js .open-next/_worker.js && if [ -d .open-next/assets ] && [ "$(ls -A .open-next/assets 2>/dev/null)" ]; then cp -r .open-next/assets/* .open-next/; else echo 'Warning: .open-next/assets is missing or empty; skipping asset copy.' >&2; fi && node -e 'require("fs").writeFileSync(".open-next/_routes.json", JSON.stringify({version:1,include:["/*"],exclude:["/_next/static/*","/favicon.ico","/robots.txt","/sitemap.xml","/404.html","/BUILD_ID"]},null,2))' && printf 'compatibility_date = "2026-02-01"\\ncompatibility_flags = ["nodejs_compat"]\\n' > .open-next/wrangler.toml"""
+
+with open('frontend/project-01/package.json', 'w') as f:
+    json.dump(data, f, indent=2)
+
+print("✅ package.json fixed")
+EOF
+
+      - name: Create commit and PR
+        if: steps.check_config.outputs.issues > 0
+        run: |
+          echo "=== Creating fix PR ==="
+          
+          git config user.name "Auto-Fix Bot"
+          git config user.email "autofix@ninja.ai"
+          
+          BRANCH_NAME="auto-fix/cloudflare-config-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          
+          git add frontend/project-01/package.json
+          git commit -m "fix: Auto-fix Cloudflare Pages build configuration
+
+Fixed issues:
+${{ steps.check_config.outputs.fixes }}
+
+This ensures:
+- wrangler.toml is generated with nodejs_compat flag
+- _worker.js is properly renamed
+- _routes.json is created
+- Correct JSON escape sequences are used
+
+Generated by auto-fix workflow."
+
+      - name: Push branch
+        if: steps.check_config.outputs.issues > 0
+        run: |
+          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push -u origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        if: steps.check_config.outputs.issues > 0
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+          title: "🤖 fix: Auto-fix Cloudflare Pages configuration"
+          body: |
+            ## 🤖 自動修復 PR
+            
+            此 PR 由自動化工作流創建，用於修復 Cloudflare Pages 配置問題。
+            
+            ### 檢測到的問題：
+            ${{ steps.check_config.outputs.fixes }}
+            
+            ### 修復內容：
+            - ✅ 添加 wrangler.toml 生成（含 nodejs_compat 標志）
+            - ✅ 添加 _worker.js 重命名步驟
+            - ✅ 添加 _routes.json 生成步驟
+            - ✅ 修正 JSON 轉義序列
+            
+            ### ⚠️ 重要：更新 Cloudflare Pages 配置
+            
+            合併此 PR 後，請更新 Cloudflare Pages 配置：
+            
+            **Build command:**
+            ```bash
+            pnpm install --no-frozen-lockfile && pnpm --filter="./frontend/project-01..." run build:cf
+            ```
+            
+            **Build output directory:**
+            ```
+            frontend/project-01/.open-next
+            ```
+            
+            ### 下一步：
+            1. ✅ 審查並合併此 PR
+            2. ✅ 更新 Cloudflare Pages 配置（見上方）
+            3. ✅ 觸發重新部署
+            
+            ---
+            
+            *此 PR 由 GitHub Actions 自動生成*
+          labels: |
+            automated-fix
+            cloudflare-pages
