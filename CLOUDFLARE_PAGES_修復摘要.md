@@ -6,16 +6,18 @@
 
 **原始指令：**
 ```json
-"build:cf": "NEXT_PUBLIC_SUPABASE_URL=https://yrfxijooswpvdpdseswy.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_rhTyBa4IqqV14nV_B87S7g_zKzDSYTd npx @opennextjs/cloudflare@1.16.5 build"
+"build:cf": "NEXT_PUBLIC_SUPABASE_URL=<原本的值> NEXT_PUBLIC_SUPABASE_ANON_KEY=<原本的值> npx @opennextjs/cloudflare@1.16.5 build"
 ```
 
 **新指令：**
 ```json
-"build:cf": "NEXT_PUBLIC_SUPABASE_URL=https://yrfxijooswpvdpdseswy.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_rhTyBa4IqqV14nV_B87S7g_zKzDSYTd npx @opennextjs/cloudflare@1.16.5 build && mv .open-next/worker.js .open-next/_worker.js && if [ -d .open-next/assets ] && [ \"$(ls -A .open-next/assets 2>/dev/null)\" ]; then cp -r .open-next/assets/* .open-next/; else echo 'Warning: .open-next/assets is missing or empty; skipping asset copy.' >&2; fi && node -e 'require(\"fs\").writeFileSync(\".open-next/_routes.json\", JSON.stringify({version:1,include:[\"/*\"],exclude:[\"/_next/static/*\",\"/favicon.ico\",\"/robots.txt\",\"/sitemap.xml\",\"/404.html\",\"/BUILD_ID\"]},null,2))' && printf 'compatibility_date = \"2026-02-01\"\\ncompatibility_flags = [\"nodejs_compat\"]\\n' > .open-next/wrangler.toml"
+"build:cf": "NEXT_PUBLIC_SUPABASE_URL=<你的_SUPABASE_URL> NEXT_PUBLIC_SUPABASE_ANON_KEY=<你的_SUPABASE_ANON_KEY> npx @opennextjs/cloudflare@1.16.5 build && mv .open-next/worker.js .open-next/_worker.js && if [ -d .open-next/assets ] && [ \"$(ls -A .open-next/assets 2>/dev/null)\" ]; then cp -r .open-next/assets/* .open-next/; else echo 'Warning: .open-next/assets is missing or empty; skipping asset copy.' >&2; fi && node -e 'require(\"fs\").writeFileSync(\".open-next/_routes.json\", JSON.stringify({version:1,include:[\"/*\"],exclude:[\"/_next/static/*\",\"/favicon.ico\",\"/robots.txt\",\"/sitemap.xml\",\"/404.html\",\"/BUILD_ID\"]},null,2))' && printf 'compatibility_date = \"2026-02-01\"\\ncompatibility_flags = [\"nodejs_compat\"]\\n' > .open-next/wrangler.toml"
 ```
 
+> **注意：** 請將 `<你的_SUPABASE_URL>` 和 `<你的_SUPABASE_ANON_KEY>` 替換為你的實際 Supabase 專案值（從 Supabase dashboard 取得，例如 `https://<你的-專案-ref>.supabase.co` 和你的公開 anon key）。這些是公開值（NEXT_PUBLIC_ 前綴表示客戶端安全使用）。
+
 **變更內容：**
-- ✅ 保留了 Supabase 環境變數
+- ✅ 包含 Supabase 環境變數（內嵌於指令中）
 - ✅ 使用 `@opennextjs/cloudflare@1.16.5` 固定版本（確保可重現的建置）
 - ✅ 添加後處理步驟：
   1. `mv .open-next/worker.js .open-next/_worker.js` - 重新命名為 Cloudflare Pages 需要的格式
