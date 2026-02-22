@@ -159,7 +159,7 @@ contracts-l1/
 - Jest 與 Playwright 覆蓋單元與端到端測試
 - ESLint 與 Prettier 維護代碼品質
 - Turborepo 加速 monorepo 的建構與測試
-- CodeRabbit AI 輔助代碼審查
+- Codacy Production bot AI 輔助審校(新增 `codacy-review` 標籤即可取得上下文見解)
 
 ## 🔄 架構演進路徑
 

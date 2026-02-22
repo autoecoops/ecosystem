@@ -303,15 +303,15 @@ GOOGLE_AI_API_KEY=AIza...
 CODECOV_TOKEN=xxx
 SNYK_TOKEN=xxx
 
-# CodeRabbit AI 審查(可選)
-CODERABBIT_API_KEY=xxx
+# Codacy Production bot AI 審校(可選)
+# 在 PR 新增 codacy-review 標籤即可觸發,無需額外 Secret
 ```
 
 ### 測試 CI/CD
 
 1. 創建新分支並提交變更
 2. 開啟 Pull Request
-3. 觀察自動觸發的檢查
+3. 新增 `codacy-review` 標籤並觀察自動觸發的檢查與 AI 審校結果
 4. 合併到 main 後自動部署
 
 ## 第九階段:監控與告警設定
